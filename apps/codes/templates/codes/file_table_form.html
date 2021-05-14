@@ -1,0 +1,41 @@
+{% load problems_tags %}
+<form role="form" method="post">
+	{% csrf_token %}
+	<table>
+		<thead>
+			<tr>
+				<th colspan=6>Files</th>
+			</tr>
+			<tr>
+				<th></th>
+				<th>#</th>
+				<th>path</th>
+				<th>flags</th>
+				<th>uploaded</th>
+				<th>by</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for file in files %}
+			<tr>
+				<td><input type="checkbox" name="datafile_id_{{file.id}}"></td>
+				<td>{{file.id}}</td>
+				<td><a href="{% url 'datafile_detail' file.id %}">{{file.datafile.name}}</a></td>
+				<td>{{file.flags}}</td>
+				<td>{{file.date}}</td>
+				<td>{{file.author}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% if datafile_add_permission %}
+	<input type="submit" name="datafile_add" value="Add"/>
+	{% endif %}
+	{% if datafile_edit_permission %}
+	<input type="submit" name="datafile_edit" value="Edit"/>
+	{% endif %}
+	{% if datafile_delete_permission %}
+	<input type="submit" name="datafile_delete" value="Delete"/>
+	{% endif %}
+	<input type="reset" value="Reset"/>
+</form>

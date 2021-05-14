@@ -1,0 +1,10 @@
+<table>
+	<thead>
+		{% include 'solvers/table_hrow.html' %}
+	</thead>
+	<tbody>
+		{% for solver in solvers %}
+		  {% include 'solvers/table_row.html' with solver=solver %}
+		{% endfor %}
+	</tbody>
+</table>

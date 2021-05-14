@@ -1,0 +1,1772 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Naive binary classifier &#8212; isolated_substorms 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Isolated substorm detection using binary classification - CNN" href="binary_classifier_cnn.html" />
+    <link rel="prev" title="Feature engineering" href="feature_engineering.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="binary_classifier_cnn.html" title="Isolated substorm detection using binary classification - CNN"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="feature_engineering.html" title="Feature engineering"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">isolated_substorms 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Naive-binary-classifier">
+<h1>Naive binary classifier<a class="headerlink" href="#Naive-binary-classifier" title="Permalink to this headline">¶</a></h1>
+<p>In this notebook I try to detect substorm events using a very simple binary classifier. The classifier is built using a neural network trained to detect two classes : - 0 : not a substorm - 1 : is a substorm</p>
+<p>The prediction data is the <code class="docutils literal notranslate"><span class="pre">AL</span> <span class="pre">index</span></code> and quantities derived from it. It was chosen because of the availability of a vast history of data, if the model we are going to define were to work we would be able to extract a big collection of substorm events. The time step is 1 minute.</p>
+<p>Labels are given between 1992-10-13 at 06:27:26 and 1993-02-15 at 01:33:40.</p>
+<div class="section" id="Submodules">
+<h2>Submodules<a class="headerlink" href="#Submodules" title="Permalink to this headline">¶</a></h2>
+<p>For readability some functionalities were implemented in submodules that are imported now.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/dataset.py">isolated_substorms.dataset</a> : Load all available data.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/labels.py">isolated_substorms.labels</a> : Load all available labels.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/train_history.py">isolated_substorms.train_history</a> : Store the models training history for later analysis.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/metrics.py">isolated_substorms.metrics</a> : F1 score and other metrics.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+
+<span class="c1"># kNN</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+
+<span class="c1"># plotting utils</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sn</span>
+
+
+<span class="c1"># Data loader class</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="c1"># Label loader class</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.labels</span> <span class="kn">import</span> <span class="n">EventLabels</span>
+<span class="c1"># Autoencoder classes</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.train_history</span> <span class="kn">import</span> <span class="n">TrainHistory</span>
+<span class="c1"># f1 score</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
+</pre></div>
+</div>
+</div>
+<p>To avoid computing the features every time the kernel is restarted we store them in a pickle file.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># configuration</span>
+<span class="n">pickle_filename</span><span class="o">=</span><span class="s2">&quot;binary_classifier_feature_data.pkl&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Training-data">
+<h3>Training data<a class="headerlink" href="#Training-data" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="Data-description">
+<h2>Data description<a class="headerlink" href="#Data-description" title="Permalink to this headline">¶</a></h2>
+<p>First we load the original data and labels. The data is a time series with values given at 1 minute intervals. Identifying substorms has to be done by hand and only a fraction of the series has been studied. The hope is that by training the model on the available events it will be able to generate a collection of potential events, significantly decreasing the number of samples.</p>
+<p>The <em>training</em> and <em>validation</em> sets are created from the <code class="docutils literal notranslate"><span class="pre">labeled_data</span></code> series (samples for which a label is “known”). The rest of the historical data is ignored at this stage as we have no efficient way of evaluating the models predictions.</p>
+<p>The mean (<code class="docutils literal notranslate"><span class="pre">labeled_data_mean</span></code>) and standard deviation (<code class="docutils literal notranslate"><span class="pre">labeled_data_std</span></code>) are stored for later use.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># get the labels</span>
+<span class="n">labels</span><span class="o">=</span><span class="n">EventLabels</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of events         : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Label timespan           : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">timespan</span><span class="p">()))</span>
+
+<span class="c1"># get AL data</span>
+<span class="n">historical_data</span><span class="o">=</span><span class="n">Dataset</span><span class="p">()</span>
+<span class="c1"># keep only data for which we have labels</span>
+<span class="n">labeled_data</span><span class="o">=</span><span class="n">historical_data</span><span class="o">.</span><span class="n">get_timespan</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">timespan</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labeled data shape       : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+<span class="n">p</span><span class="o">=</span><span class="mf">100.</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">historical_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Proportion of total data : </span><span class="si">{}</span><span class="s2"> %&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+<span class="n">labeled_data_mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">)</span>
+<span class="n">labeled_data_std</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean                     : </span><span class="si">{}</span><span class="s2"> nT&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labeled_data_mean</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Standard deviation       : </span><span class="si">{}</span><span class="s2"> nT&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labeled_data_std</span><span class="p">))</span>
+<span class="c1"># Normalize the series</span>
+<span class="n">labeled_data</span><span class="o">=</span><span class="p">(</span><span class="n">labeled_data</span> <span class="o">-</span> <span class="n">labeled_data_mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">labeled_data_std</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of events         : 76
+Label timespan           : 1992-10-13 06:27:26 -&gt; 1993-02-15 01:33:40
+Labeled data shape       : (179946,)
+Proportion of total data : 3.416106383657303 %
+Mean                     : -141.652167872584 nT
+Standard deviation       : 167.2879219136791 nT
+</pre></div></div>
+</div>
+<p>Lets take a look at the data that will be used to train the neural network. The events we are intersted in start with a <code class="docutils literal notranslate"><span class="pre">calm</span></code> phase where the value is close to zero followed by an <code class="docutils literal notranslate"><span class="pre">onset</span></code> where the index rapidly decreases. Finaly the <code class="docutils literal notranslate"><span class="pre">recovery</span></code> phase sees the index slowly return to its original value.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># plot the AL index</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.plot_utils</span> <span class="kn">import</span> <span class="n">plot_series_and_histogram</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_series_and_histogram</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">,</span>\
+         <span class="s2">&quot;AL index : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">timespan</span><span class="p">()),</span>\
+                               <span class="mi">100</span><span class="p">,</span>\
+                               <span class="s2">&quot;AL (nT)&quot;</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_7_0.png" src="_images/binary_classifier_7_0.png" />
+</div>
+</div>
+<p>It is difficult to distiguish the events at this time scale. We can see that the <code class="docutils literal notranslate"><span class="pre">AL</span> <span class="pre">index</span></code> has mostly negative value and seems to be subject to sudden variations of great amplitude.</p>
+<p>The values distribution is greatly skewed towards negative values.</p>
+<p>Neural networks generaly work better with normalized input data, we will need to perform some transformations of the input data for it to be better suited to the prediction task.</p>
+<p>Further more since the value of the index over a given time period may not contain sufficient information to allow accurate predictions we will add new features to the training data derived from the <code class="docutils literal notranslate"><span class="pre">AL</span> <span class="pre">index</span></code> values.</p>
+<div class="section" id="Feature-engineering">
+<h3>Feature engineering<a class="headerlink" href="#Feature-engineering" title="Permalink to this headline">¶</a></h3>
+<p>The presence of a substorm event at time <code class="docutils literal notranslate"><span class="pre">t</span></code> is dictated by the behaviour of the index <code class="docutils literal notranslate"><span class="pre">before</span></code> and <code class="docutils literal notranslate"><span class="pre">after</span></code> time <code class="docutils literal notranslate"><span class="pre">t</span></code>. Each sample given to our detection model will be a window of size <code class="docutils literal notranslate"><span class="pre">window_size</span></code> centered on the event onset.</p>
+<p>We chose a <code class="docutils literal notranslate"><span class="pre">window_size</span></code> of 180 points, representing 3 hours of data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># convert dataset and labels to features that we can use to train the model</span>
+<span class="k">def</span> <span class="nf">make_features</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">180</span><span class="p">):</span>
+    <span class="n">n</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">w_delta</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">window_size</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># feature and label containers</span>
+    <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span><span class="o">-</span><span class="n">window_size</span><span class="p">,</span><span class="n">window_size</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">window_size</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">w_delta</span><span class="p">,</span><span class="n">n</span><span class="o">-</span><span class="n">w_delta</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">w_delta</span><span class="p">]</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">w_delta</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">w_delta</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">w_delta</span><span class="p">]</span><span class="o">=</span><span class="n">labels</span><span class="o">.</span><span class="n">check_date</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="c1">#for i in range(window_size,n):</span>
+    <span class="c1">#    x[i-window_size]=data[i-window_size:i].to_numpy()</span>
+    <span class="c1">#    y[i-window_size]=labels.check_date(data.index[i])</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pickle_filename</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving features to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pickle_filename</span><span class="p">))</span>
+    <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">make_features</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span><span class="nb">open</span><span class="p">(</span><span class="n">pickle_filename</span><span class="p">,</span><span class="s2">&quot;wb&quot;</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading features from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pickle_filename</span><span class="p">))</span>
+    <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">pkl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">pickle_filename</span><span class="p">,</span><span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Loading features from binary_classifier_feature_data.pkl
+</pre></div></div>
+</div>
+<p>There are not many events in the input data, and we will try to make additional training sets (with added uniform noise, normal noise, normalized data, synthetic samples, etc). Lets put aside the original features for futur reference (<code class="docutils literal notranslate"><span class="pre">x_original,</span> <span class="pre">y_original</span></code>).</p>
+<p>We will then create a collection of <em>three</em> training sets with the following characteristics : - 1. original features, imbalanced classes - 2. original features + synthetic sample, imbalanced class - a. uniform noise - b. normal noise</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">x_original</span><span class="p">,</span><span class="n">y_original</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span>
+
+<span class="kn">from</span> <span class="nn">isolated_substorms.data_utils</span> <span class="kn">import</span> <span class="n">selfconcat</span>
+<span class="c1"># synthetic samples</span>
+<span class="n">x_synthetic</span> <span class="o">=</span> <span class="n">selfconcat</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">y_synthetic</span> <span class="o">=</span> <span class="n">selfconcat</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># add uniform noise</span>
+<span class="n">x_unif_noise</span> <span class="o">=</span> <span class="n">x_synthetic</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">x_synthetic</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span>
+
+<span class="c1"># add normal noise</span>
+<span class="n">x_norm_noise</span> <span class="o">=</span> <span class="n">x_synthetic</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">x_synthetic</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># training set collection</span>
+<span class="n">training_sets</span><span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;original&quot;</span><span class="p">,</span><span class="n">x_original</span><span class="p">,</span> <span class="n">y_original</span><span class="p">),</span>\
+                <span class="p">(</span><span class="s2">&quot;unif_noise&quot;</span><span class="p">,</span><span class="n">x_unif_noise</span><span class="p">,</span> <span class="n">y_synthetic</span><span class="p">),</span>\
+                <span class="p">(</span><span class="s2">&quot;norm_noise&quot;</span><span class="p">,</span><span class="n">x_norm_noise</span><span class="p">,</span> <span class="n">y_synthetic</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<p>First we will concentrate on the original training set <code class="docutils literal notranslate"><span class="pre">x_original,</span> <span class="pre">y_original</span></code> to illustrate the training, predicting and evaluating procedure. Then we will pack all of the piece into a <code class="docutils literal notranslate"><span class="pre">Detector</span></code> class and compare the performances of the model with each of the training sets defined above.</p>
+</div>
+<div class="section" id="Fitting-and-predicting">
+<h3>Fitting and predicting<a class="headerlink" href="#Fitting-and-predicting" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="The-classifier">
+<h2>The classifier<a class="headerlink" href="#The-classifier" title="Permalink to this headline">¶</a></h2>
+<p>Here we define a simple binary classification neural network.</p>
+<p>The class implements a <code class="docutils literal notranslate"><span class="pre">train</span></code> function that takes the input data and performs the training procedure (with early stopping). The loss function used is <code class="docutils literal notranslate"><span class="pre">CrossEntropyLoss</span></code> and the optimizer <code class="docutils literal notranslate"><span class="pre">Stochastic</span> <span class="pre">gradient</span> <span class="pre">descent</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">BinaryClassifier</span></code> class is only a base class that implements the <code class="docutils literal notranslate"><span class="pre">train</span></code> method. The actual classifier must be defined by inheriting from <code class="docutils literal notranslate"><span class="pre">BinaryClassifier</span></code>.</p>
+<p>This class can be imported from the <code class="docutils literal notranslate"><span class="pre">isolated_substorms.binary_classifier</span></code> module.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">BinaryClassifier</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BinaryClassifier</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="o">=</span><span class="kc">None</span>
+    <span class="k">def</span> <span class="nf">validation_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">criterion</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+            <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_validation</span><span class="p">,</span> <span class="n">y_validation</span><span class="p">,</span>\
+             <span class="n">lr</span><span class="o">=</span><span class="mf">1.e-4</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span>\
+             <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-6</span><span class="p">,</span>\
+             <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>\
+             <span class="n">max_epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>\
+             <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">optimizer</span><span class="o">=</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>\
+                            <span class="n">momentum</span><span class="o">=</span><span class="n">momentum</span><span class="p">)</span>
+        <span class="n">criterion</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span><span class="mf">10.</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="o">=</span><span class="n">TrainHistory</span><span class="p">(</span><span class="n">loss_name</span><span class="o">=</span><span class="s2">&quot;CrossEntropy&quot;</span><span class="p">)</span>
+        <span class="n">n_train</span><span class="o">=</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_epochs</span><span class="p">):</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">epoch_pos</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_train</span><span class="p">),</span><span class="n">n_train</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="n">epoch_pos</span><span class="p">])</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="n">y_train</span><span class="p">[</span><span class="n">epoch_pos</span><span class="p">])</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">train_loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+            <span class="n">val_score</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_score</span><span class="p">(</span><span class="n">x_validation</span><span class="p">,</span><span class="n">y_validation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">validation_loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_score</span><span class="p">)</span>
+            <span class="c1"># check stopping condition</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_condition</span><span class="p">(</span><span class="n">validation_tol</span><span class="o">=</span><span class="n">validation_tol</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_status</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;epoch:</span><span class="si">{}</span><span class="s2">,loss:</span><span class="si">{:.5f}</span><span class="s2">,validation:</span><span class="si">{:.5f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span><span class="n">val_score</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y_pred</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>For a first implementation we chose an exceedingly simple model : one layer network with a sigmoid activation function. The models input is a <code class="docutils literal notranslate"><span class="pre">180</span></code> size window and its output is composed of two values between 0 and 1 representing the <em>confidence</em> of the model in both classes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">MyBinClass</span><span class="p">(</span><span class="n">BinaryClassifier</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_size</span><span class="o">=</span><span class="mi">180</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MyBinClass</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l1</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Training-the-model">
+<h2>Training the model<a class="headerlink" href="#Training-the-model" title="Permalink to this headline">¶</a></h2>
+<p>Usually training a neural network is done by separating the input data into a <em>training</em> and <em>validation</em> sets. The <em>training</em> set is used for the actual parameter optimization and the validation is used for checking that the model is not overfitting.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># split into training and validation sets</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.data_utils</span> <span class="kn">import</span> <span class="n">split_data</span>
+
+<span class="n">x_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">,</span><span class="n">x_validation</span><span class="p">,</span><span class="n">y_validation</span><span class="o">=</span><span class="n">split_data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="o">.</span><span class="mi">66</span><span class="p">)</span>
+
+<span class="c1"># need them as torch Tensor objects for training</span>
+<span class="n">x_train</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+<span class="n">y_train</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+<span class="n">x_validation</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_validation</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+<span class="n">y_validation</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_validation</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Parameters used for training. Implemented early stopping with patience value of 10.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="51%" />
+<col width="36%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Variable name</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>learning rate</td>
+<td>lr</td>
+<td>1.e-2</td>
+</tr>
+<tr class="row-odd"><td>validation tolerance</td>
+<td>validation_tol</td>
+<td>1.e-6</td>
+</tr>
+<tr class="row-even"><td>training patience</td>
+<td>patience</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span>
+<span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-6</span>
+<span class="n">classifier</span><span class="o">=</span><span class="n">MyBinClass</span><span class="p">()</span>
+<span class="o">%</span><span class="k">time</span> train_history = classifier.train(x_train, y_train, \
+                                  <span class="n">x_validation</span><span class="p">,</span> <span class="n">y_validation</span><span class="p">,</span> \
+                                  <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>\
+                                  <span class="n">validation_tol</span><span class="o">=</span><span class="n">validation_tol</span><span class="p">,</span>\
+                                  <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>\
+                                  <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">train_loss_fig</span><span class="o">=</span><span class="n">train_history</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;End of training status : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_status</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+CPU times: user 1min 55s, sys: 15.3 s, total: 2min 10s
+Wall time: 22.5 s
+End of training status : validation increased, exceeded patience
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_21_1.png" src="_images/binary_classifier_21_1.png" />
+</div>
+</div>
+<p>Now that we have trained the model lets test it on the full time period.</p>
+</div>
+<div class="section" id="Prediction">
+<h2>Prediction<a class="headerlink" href="#Prediction" title="Permalink to this headline">¶</a></h2>
+<p>Next we apply the prediction to the full time perido and view the resulting normalized confusion matrix.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># plot train and validation encoded data</span>
+<span class="n">y_predicted</span><span class="o">=</span><span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># confusion matrix</span>
+<span class="k">def</span> <span class="nf">confusion_matrix</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="n">actual</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;predicted&quot;</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">predicted</span><span class="p">),</span>\
+                  <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;actual&quot;</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">actual</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">cm</span>
+
+<span class="n">confusion</span><span class="o">=</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_predicted</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Confusion matrix, F1 score = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f1_score</span><span class="p">(</span><span class="n">y_predicted</span><span class="p">,</span> <span class="n">y</span><span class="p">)))</span>
+<span class="n">sn</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">confusion</span><span class="p">,</span><span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_24_0.png" src="_images/binary_classifier_24_0.png" />
+</div>
+</div>
+<p>Sadly in this case the model only ever detects class <code class="docutils literal notranslate"><span class="pre">0</span></code>. This is probably due to the overwhelming number of <code class="docutils literal notranslate"><span class="pre">0</span></code> labeled samples in the training data.</p>
+<p>For the sake of convenience lets define a plot function for generating a figure containing on the left the training and validation losses and on the right the confusion matrix.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">plot_losses_and_confusion</span></code> takes a pre-fitted model, the input and label data used for predicting and computing the confusion matrix. It return a figure.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">plot_losses_and_confusion</span><span class="p">(</span><span class="n">fitted_model</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># compute prediction</span>
+    <span class="n">nnn</span><span class="o">=</span><span class="n">fitted_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">f1</span><span class="o">=</span><span class="n">f1_score</span><span class="p">(</span><span class="n">nnn</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">cm</span><span class="o">=</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">nnn</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="c1"># normalize the confusion matrix</span>
+    <span class="n">cm</span><span class="o">=</span><span class="n">cm</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>
+    <span class="c1"># create plot</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">, F1=</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="n">f1</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fitted_model</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">sn</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span><span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(),</span><span class="n">vmin</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">classifier</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;Dataset : original&quot;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_26_0.png" src="_images/binary_classifier_26_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Defining-the-Detector-class">
+<h2>Defining the Detector class<a class="headerlink" href="#Defining-the-Detector-class" title="Permalink to this headline">¶</a></h2>
+<p>Pack the steps presented above into one object making comparisons easier. A detector can be initialized by <code class="docutils literal notranslate"><span class="pre">BCDetector(model_1)</span></code> where <code class="docutils literal notranslate"><span class="pre">model_1</span></code> is a callable object that returns a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> object when called. This allows the user to define their own binary classifier and create a substorm detector object out of it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">BCDetector</span></code> is a member of the <code class="docutils literal notranslate"><span class="pre">isolated_substorms.binary_classifier</span></code> module.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">BCDetector</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_constructor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">model_constructor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">=</span><span class="n">MyBinClass</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">=</span><span class="n">model_constructor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="o">=</span><span class="kc">None</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span><span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-6</span><span class="p">,</span>\
+           <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Fitting model...&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="c1"># prepare the data</span>
+        <span class="n">x_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">,</span><span class="n">x_validation</span><span class="p">,</span><span class="n">y_validation</span><span class="o">=</span><span class="n">split_data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="o">.</span><span class="mi">66</span><span class="p">)</span>
+
+        <span class="c1"># need them as torch Tensor objects for training</span>
+        <span class="n">x_train</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">y_train</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+        <span class="n">x_validation</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_validation</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">y_validation</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_validation</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+        <span class="c1"># train the model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>\
+                                  <span class="n">x_validation</span><span class="p">,</span> <span class="n">y_validation</span><span class="p">,</span>\
+                                  <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>\
+                                  <span class="n">validation_tol</span><span class="o">=</span><span class="n">validation_tol</span><span class="p">,</span>\
+                                  <span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">,</span>\
+                                  <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;done</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># predict</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Test the <code class="docutils literal notranslate"><span class="pre">BCDetector</span></code> on each of the training sets.</p>
+<p>We use the following training parameters :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="51%" />
+<col width="36%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Variable name</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>learning rate</td>
+<td>lr</td>
+<td>1.e-2</td>
+</tr>
+<tr class="row-odd"><td>validation tolerance</td>
+<td>validation_tol</td>
+<td>1.e-6</td>
+</tr>
+<tr class="row-even"><td>training patience</td>
+<td>patience</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_t</span><span class="p">,</span> <span class="n">y_t</span> <span class="ow">in</span> <span class="n">training_sets</span><span class="p">:</span>
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">BCDetector</span><span class="p">()</span>
+    <span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span><span class="n">y_t</span><span class="p">,</span><span class="n">lr</span><span class="o">=.</span><span class="mi">01</span><span class="p">,</span><span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-6</span><span class="p">,</span>\
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_30_0.png" src="_images/binary_classifier_30_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_30_1.png" src="_images/binary_classifier_30_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_30_2.png" src="_images/binary_classifier_30_2.png" />
+</div>
+</div>
+<p>The input data is unbalanced and that is why they are incapable of detecting <code class="docutils literal notranslate"><span class="pre">positive</span></code> samples. This is most likely due to the fact that the <code class="docutils literal notranslate"><span class="pre">negative</span></code> class far outnumbers the <code class="docutils literal notranslate"><span class="pre">positive</span></code> class.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">training_set_name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">training_set_y</span> <span class="ow">in</span> <span class="n">training_sets</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">training_set_name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">positive samples : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">training_set_y</span><span class="o">==</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">negative samples : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">training_set_y</span><span class="o">==</span><span class="mi">0</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+original
+        positive samples : 351
+        negative samples : 179415
+unif_noise
+        positive samples : 3510
+        negative samples : 1794150
+norm_noise
+        positive samples : 3510
+        negative samples : 1794150
+</pre></div></div>
+</div>
+<div class="section" id="Class-balancing">
+<h3>Class balancing<a class="headerlink" href="#Class-balancing" title="Permalink to this headline">¶</a></h3>
+<p>One of the classes is far more represented in the training data than the other class. We want to remedy this issue.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># equalize classes</span>
+<span class="k">def</span> <span class="nf">balance_classes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">weights</span><span class="p">):</span>
+    <span class="c1"># positive labels</span>
+    <span class="n">x_positive</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">n_positive</span><span class="o">=</span><span class="n">x_positive</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># negative labels</span>
+    <span class="n">x_negative</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># shuffle the negative labels</span>
+    <span class="n">x_negative</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">x_negative</span><span class="p">)</span>
+    <span class="c1"># concatenate positive and negative samples</span>
+    <span class="n">x_temp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">x_positive</span><span class="p">,</span><span class="n">x_negative</span><span class="p">[:</span><span class="n">n_positive</span><span class="p">]),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">y_temp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_positive</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_positive</span><span class="p">)),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">x_temp</span><span class="p">,</span><span class="n">y_temp</span><span class="p">)</span>
+<span class="n">x_balanced</span><span class="p">,</span><span class="n">y_balanced</span><span class="o">=</span><span class="n">balance_classes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Balanced data shape :</span><span class="se">\n\t</span><span class="s2">x.shape : </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">y.shape : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_balanced</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_balanced</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Balanced data shape :
+        x.shape : (702, 180)
+        y.shape : (702,)
+</pre></div></div>
+</div>
+<p>Train the model and predict, hope to see an improvement of the F1 score.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">detector</span> <span class="o">=</span> <span class="n">BCDetector</span><span class="p">()</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_balanced</span><span class="p">,</span><span class="n">y_balanced</span><span class="p">,</span><span class="n">lr</span><span class="o">=.</span><span class="mi">01</span><span class="p">,</span><span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>\
+             <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-6</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;balanced&quot;</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_36_0.png" src="_images/binary_classifier_36_0.png" />
+</div>
+</div>
+<p>Quite obviously the model performs much better under these conditions. Note that the <code class="docutils literal notranslate"><span class="pre">F1</span> <span class="pre">score</span></code> is still very low. The training parameters had to be adapted to the new model :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="51%" />
+<col width="36%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Variable name</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>learning rate</td>
+<td>lr</td>
+<td>1.e-2</td>
+</tr>
+<tr class="row-odd"><td>validation tolerance</td>
+<td>validation_tol</td>
+<td>1.e-6</td>
+</tr>
+<tr class="row-even"><td>patience</td>
+<td>patience</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>As we did with the original data we are going to create a collection of training sets : - balanced data - balanced data + synthetic data (x10) - uniform noise - normal noise</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># balanced data + synthetic samples</span>
+<span class="n">x_balanced_synthetic</span> <span class="o">=</span> <span class="n">selfconcat</span><span class="p">(</span><span class="n">x_balanced</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">y_balanced_synthetic</span> <span class="o">=</span> <span class="n">selfconcat</span><span class="p">(</span><span class="n">y_balanced</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># add uniform noise</span>
+<span class="n">x_balanced_unif_noise</span> <span class="o">=</span> <span class="n">x_balanced_synthetic</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">x_balanced_synthetic</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># add normal noise</span>
+<span class="n">x_balanced_norm_noise</span> <span class="o">=</span> <span class="n">x_balanced_synthetic</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">x_balanced_synthetic</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># feature standardization</span>
+<span class="k">def</span> <span class="nf">standardize_features</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">m</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">m</span><span class="p">)</span><span class="o">/</span><span class="n">s</span>
+<span class="n">x_bal_stan</span> <span class="o">=</span> <span class="n">standardize_features</span><span class="p">(</span><span class="n">x_balanced</span><span class="p">)</span>
+<span class="n">x_bal_synth_stan</span> <span class="o">=</span> <span class="n">standardize_features</span><span class="p">(</span><span class="n">x_balanced_synthetic</span><span class="p">)</span>
+<span class="n">x_bal_stan_unif_noise</span> <span class="o">=</span> <span class="n">standardize_features</span><span class="p">(</span><span class="n">x_balanced_unif_noise</span><span class="p">)</span>
+<span class="n">x_bal_stan_norm_noise</span> <span class="o">=</span> <span class="n">standardize_features</span><span class="p">(</span><span class="n">x_balanced_norm_noise</span><span class="p">)</span>
+
+<span class="c1"># training set collection</span>
+<span class="n">balanced_training_sets</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;balanced&quot;</span><span class="p">,</span><span class="n">x_balanced</span><span class="p">,</span><span class="n">y_balanced</span><span class="p">),</span>\
+                        <span class="p">(</span><span class="s2">&quot;balanced + synthetic&quot;</span><span class="p">,</span> <span class="n">x_balanced_synthetic</span><span class="p">,</span> <span class="n">y_balanced_synthetic</span><span class="p">),</span>\
+                        <span class="p">(</span><span class="s2">&quot;balanced + synthetic + uniform&quot;</span><span class="p">,</span> <span class="n">x_balanced_unif_noise</span><span class="p">,</span> <span class="n">y_balanced_synthetic</span><span class="p">),</span>\
+                        <span class="p">(</span><span class="s2">&quot;balanced + synthetic + normal&quot;</span><span class="p">,</span> <span class="n">x_balanced_norm_noise</span><span class="p">,</span> <span class="n">y_balanced_synthetic</span><span class="p">),</span>\
+                        <span class="p">(</span><span class="s2">&quot;balanced  STD&quot;</span><span class="p">,</span> <span class="n">x_bal_stan</span><span class="p">,</span> <span class="n">y_balanced</span><span class="p">),</span>\
+                        <span class="p">(</span><span class="s2">&quot;balanced + synthetic STD&quot;</span><span class="p">,</span> <span class="n">x_bal_synth_stan</span><span class="p">,</span> <span class="n">y_balanced_synthetic</span><span class="p">),</span>\
+                        <span class="p">(</span><span class="s2">&quot;balanced + synthetic + uniform STD&quot;</span><span class="p">,</span> <span class="n">x_bal_stan_unif_noise</span><span class="p">,</span> <span class="n">y_balanced_synthetic</span><span class="p">),</span>\
+                        <span class="p">(</span><span class="s2">&quot;balanced + synthetic + normal STD&quot;</span><span class="p">,</span> <span class="n">x_bal_stan_norm_noise</span><span class="p">,</span> <span class="n">y_balanced_synthetic</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<p>Fit our model and predict with each of the training sets.</p>
+<p>We use the following training parameters :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="51%" />
+<col width="36%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Variable name</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>learning rate</td>
+<td>lr</td>
+<td>1.e-2</td>
+</tr>
+<tr class="row-odd"><td>validation tolerance</td>
+<td>validation_tol</td>
+<td>1.e-6</td>
+</tr>
+<tr class="row-even"><td>training patience</td>
+<td>patience</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_t</span><span class="p">,</span> <span class="n">y_t</span> <span class="ow">in</span> <span class="n">balanced_training_sets</span><span class="p">:</span>
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">BCDetector</span><span class="p">()</span>
+    <span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span><span class="n">y_t</span><span class="p">,</span><span class="n">lr</span><span class="o">=.</span><span class="mi">01</span><span class="p">,</span><span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-6</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_0.png" src="_images/binary_classifier_40_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_1.png" src="_images/binary_classifier_40_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_2.png" src="_images/binary_classifier_40_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_3.png" src="_images/binary_classifier_40_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_4.png" src="_images/binary_classifier_40_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_5.png" src="_images/binary_classifier_40_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_6.png" src="_images/binary_classifier_40_6.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_40_7.png" src="_images/binary_classifier_40_7.png" />
+</div>
+</div>
+<p>The performance of the models are very sensitive to the initial conditions of the neural networks parameters. To evaluate the models we repeate the training/prediction procedure <code class="docutils literal notranslate"><span class="pre">n</span></code> time and plot the score distribution.</p>
+</div>
+</div>
+<div class="section" id="Evaluation">
+<h2>Evaluation<a class="headerlink" href="#Evaluation" title="Permalink to this headline">¶</a></h2>
+<p>The neural networks behaviours seems to be very sensitive to its parameters initial values. To get an reliable evaluation of the performance of the model we repeatedly initialize and fit the model and store its score.</p>
+<p>For each training dataset we run 100 fittings and predictions, and we store the F1 scores in a list <code class="docutils literal notranslate"><span class="pre">simulated_f1_scores</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">model_constructor</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">scores</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model_constructor</span><span class="p">()</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lr</span><span class="o">=.</span><span class="mi">01</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-6</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">pred</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">f1_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scores</span>
+
+
+<span class="n">simulated_f1_scores</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_t</span><span class="p">,</span> <span class="n">y_t</span> <span class="ow">in</span> <span class="n">balanced_training_sets</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Testing on set : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+    <span class="n">simulated_f1_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_model</span><span class="p">(</span><span class="n">BCDetector</span><span class="p">,</span> <span class="n">x_t</span><span class="p">,</span> <span class="n">y_t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Testing on set : balanced
+Testing on set : balanced + synthetic
+Testing on set : balanced + synthetic + uniform
+Testing on set : balanced + synthetic + normal
+Testing on set : balanced  STD
+Testing on set : balanced + synthetic STD
+Testing on set : balanced + synthetic + uniform STD
+Testing on set : balanced + synthetic + normal STD
+</pre></div></div>
+</div>
+<p>We would like to view the distribution of the models scores depending on the data that was used to train it.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">hist_handle</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">simulated_f1_scores</span><span class="p">,</span><span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;F1 score distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;F1 score&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="n">balanced_training_sets</span><span class="p">])</span>
+<span class="c1"># save the color patches for</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
+<span class="n">bar_colors</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">cont</span> <span class="ow">in</span> <span class="n">hist_handle</span><span class="p">:</span>
+    <span class="n">bar_colors</span><span class="o">.</span><span class="n">append</span><span class="p">([</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cont</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;_original_facecolor&quot;</span><span class="p">]])</span>
+
+<span class="n">patches</span><span class="o">=</span><span class="p">[</span><span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">bar_colors</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_45_0.png" src="_images/binary_classifier_45_0.png" />
+</div>
+</div>
+<p>Feature standardization seems to address the stability of the model and will be used throughout futur tests.</p>
+<p>The next figure contains means and standard deviations of the scores.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># get mean and standard deviation for each set of scores in simulated_f1_scores</span>
+<span class="n">scores_mean</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">simulated_f1_scores</span><span class="p">]</span>
+<span class="n">scores_std</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">simulated_f1_scores</span><span class="p">]</span>
+<span class="n">N</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">simulated_f1_scores</span><span class="p">)</span>
+<span class="c1"># prepare plot</span>
+<span class="n">xticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">simulated_f1_scores</span><span class="p">))</span>
+<span class="n">labels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="n">balanced_training_sets</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span> <span class="n">scores_mean</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">bar_colors</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Mean&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span> <span class="n">scores_std</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">bar_colors</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Standard deviation&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">70</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best model : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">scores_mean</span><span class="p">)]))</span>
+
+
+<span class="n">labels_and_scores</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">labels</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">scores_mean</span><span class="p">)]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span>\
+                  <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">scores_mean</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">))),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">sorted_pos</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">labels_and_scores</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sorted     :</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels_and_scores</span><span class="p">[</span><span class="n">sorted_pos</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+&lt;ipython-input-37-746ec2c01c08&gt;:13: UserWarning: FixedFormatter should only be used together with FixedLocator
+  axes[1].set_xticklabels(labels=labels, rotation=70)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/binary_classifier_47_1.png" src="_images/binary_classifier_47_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Best model : balanced + synthetic + uniform
+Sorted     :
+[[&#39;balanced + synthetic + normal STD&#39; 0.006291506751147329]
+ [&#39;balanced  STD&#39; 0.006343021252380132]
+ [&#39;balanced + synthetic + uniform STD&#39; 0.00634550802854545]
+ [&#39;balanced + synthetic STD&#39; 0.006367186899705628]
+ [&#39;balanced + synthetic + normal&#39; 0.006463037980840617]
+ [&#39;balanced&#39; 0.006465456644103855]
+ [&#39;balanced + synthetic&#39; 0.006466496844881304]
+ [&#39;balanced + synthetic + uniform&#39; 0.00647179792008194]]
+</pre></div></div>
+</div>
+<p>There are too many samples predicted <code class="docutils literal notranslate"><span class="pre">positive</span></code> but alot of them are consecutive frames. Lets define a function for grouping these samples together.</p>
+</div>
+<div class="section" id="False-positives">
+<h2>False positives<a class="headerlink" href="#False-positives" title="Permalink to this headline">¶</a></h2>
+<p>Just view a couple of the false negatives we get with the best model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">detector</span><span class="o">=</span><span class="n">BCDetector</span><span class="p">()</span>
+<span class="n">set_name</span><span class="p">,</span><span class="n">x_train</span><span class="p">,</span><span class="n">y_train</span><span class="o">=</span><span class="n">balanced_training_sets</span><span class="p">[</span><span class="n">sorted_pos</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lr</span><span class="o">=.</span><span class="mi">00001</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-12</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">prediction</span><span class="o">=</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># false positives</span>
+<span class="n">fp_mask</span><span class="o">=</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">false_positives_features</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">fp_mask</span><span class="p">]</span>
+<span class="n">n_false_positive</span><span class="o">=</span><span class="n">false_positives_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;False positive count : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">))</span>
+<span class="c1"># choose N false positives and plot the corresponding sample</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">8</span>
+<span class="n">rpos</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">),</span><span class="n">N</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rpos</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">false positive samples&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">set_name</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="1D-CNN">
+<h2>1D CNN<a class="headerlink" href="#1D-CNN" title="Permalink to this headline">¶</a></h2>
+<p>Lets try adding a 1D convolution layer to the detection model and see its performances.</p>
+<p>Firstly we define a new classification model that takes as input batches of 2 dimensional data (1 channel, <code class="docutils literal notranslate"><span class="pre">window_size</span></code> data points. Notice that the input size is not the same then it was for the previously studied models. The training and testing datasets are reshaped by calling the <code class="docutils literal notranslate"><span class="pre">MyCNNBinClass.reshape_input</span></code> method, this method is executed each time the <code class="docutils literal notranslate"><span class="pre">forward</span></code> method is called.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">### 1D CNN binary classificator</span>
+<span class="k">class</span> <span class="nc">MyCNNBinClass</span><span class="p">(</span><span class="n">BinaryClassifier</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">kernel_dim</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MyCNNBinClass</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dim</span><span class="o">=</span><span class="n">kernel_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">880</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dim</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">def</span> <span class="nf">reshape_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+</pre></div>
+</div>
+</div>
+<p>Now we test the new detector on the best dataset identified in the previous steps. The training parameters :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="35%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Variable name</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>learning rate</td>
+<td>lr</td>
+<td>1.e-6</td>
+</tr>
+<tr class="row-odd"><td>validation tolerance</td>
+<td>validation_tol</td>
+<td>1.e-12</td>
+</tr>
+<tr class="row-even"><td>patience</td>
+<td>patience</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># get best performing dataset</span>
+<span class="n">set_name</span><span class="p">,</span><span class="n">x_train</span><span class="p">,</span><span class="n">y_train</span><span class="o">=</span><span class="n">balanced_training_sets</span><span class="p">[</span><span class="n">sorted_pos</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+<span class="c1"># initialize the detector</span>
+<span class="n">cnn_detector</span> <span class="o">=</span> <span class="n">BCDetector</span><span class="p">(</span><span class="n">model_constructor</span><span class="o">=</span><span class="n">MyCNNBinClass</span><span class="p">)</span>
+<span class="c1"># fit the detector to the data</span>
+<span class="n">cnn_detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">lr</span><span class="o">=.</span><span class="mi">00001</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-12</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training stop status : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cnn_detector</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_status</span><span class="p">))</span>
+<span class="c1"># plot loss</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">cnn_detector</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">set_name</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+
+</pre></div>
+</div>
+</div>
+<p>Notice that the F1 score for this model is higher than the score obtained with all previous models, but the increase is still too small.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">prediction</span><span class="o">=</span><span class="n">cnn_detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># false positives</span>
+<span class="n">fp_mask</span><span class="o">=</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">false_positives_features</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">fp_mask</span><span class="p">]</span>
+<span class="n">n_false_positive</span><span class="o">=</span><span class="n">false_positives_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;False positive count : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">))</span>
+<span class="c1"># choose N false positives and plot the corresponding sample</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">8</span>
+<span class="n">rpos</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">),</span><span class="n">N</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rpos</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">false positive samples&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">set_name</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">## Training on the log index</span>
+<span class="n">temp_data</span><span class="o">=</span><span class="n">labeled_data</span><span class="o">*</span><span class="n">labeled_data_std</span> <span class="o">+</span> <span class="n">labeled_data_mean</span>
+<span class="n">temp_data</span><span class="o">=</span><span class="n">temp_data</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span>
+<span class="n">temp_data</span><span class="o">=</span><span class="n">temp_data</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">temp_data</span><span class="p">)</span>
+<span class="n">log_data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">temp_data</span><span class="p">)</span>
+<span class="n">labels</span><span class="o">=</span><span class="n">EventLabels</span><span class="p">()</span>
+
+<span class="n">x_log</span><span class="p">,</span><span class="n">y_log</span><span class="o">=</span><span class="n">make_features</span><span class="p">(</span><span class="n">log_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+<span class="n">x_log_unbalanced</span><span class="p">,</span> <span class="n">y_log_unbalanced</span><span class="o">=</span><span class="n">x_log</span><span class="p">,</span><span class="n">y_log</span>
+<span class="n">x_log</span><span class="p">,</span><span class="n">y_log</span><span class="o">=</span><span class="n">balance_classes</span><span class="p">(</span><span class="n">x_log</span><span class="p">,</span><span class="n">y_log</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+
+
+<span class="n">x_log_mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x_log</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">x_log_std</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x_log</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1">#print(&quot;Log data mean : {}&quot;.format(x_log_mean))</span>
+<span class="c1">#print(&quot;Log data std  : {}&quot;.format(x_log_std))</span>
+
+<span class="n">x_log_unbalanced</span><span class="o">=</span><span class="p">(</span><span class="n">x_log_unbalanced</span><span class="o">-</span><span class="n">x_log_mean</span><span class="p">)</span><span class="o">/</span><span class="n">x_log_std</span>
+<span class="n">x_log</span><span class="o">=</span><span class="p">(</span><span class="n">x_log</span><span class="o">-</span><span class="n">x_log_mean</span><span class="p">)</span><span class="o">/</span><span class="n">x_log_std</span>
+
+<span class="c1"># train the model</span>
+<span class="n">detector</span><span class="o">=</span><span class="n">BCDetector</span><span class="p">(</span><span class="n">model_constructor</span><span class="o">=</span><span class="n">MyCNNBinClass</span><span class="p">)</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_log</span><span class="p">,</span> <span class="n">y_log</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">lr</span><span class="o">=.</span><span class="mi">0001</span><span class="p">)</span>
+<span class="c1"># transform the test data to fit the model</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span><span class="n">x_log_unbalanced</span><span class="p">,</span> <span class="n">y_log_unbalanced</span><span class="p">,</span> <span class="s2">&quot;Dataset : Log data&quot;</span><span class="p">)</span>
+
+<span class="c1"># train the model</span>
+<span class="n">detectorbase</span><span class="o">=</span><span class="n">BCDetector</span><span class="p">(</span><span class="n">model_constructor</span><span class="o">=</span><span class="n">MyCNNBinClass</span><span class="p">)</span>
+<span class="n">detectorbase</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span> <span class="n">x_bal_stan</span><span class="p">,</span> <span class="n">y_balanced</span><span class="p">,</span><span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">lr</span><span class="o">=.</span><span class="mi">0001</span><span class="p">)</span>
+<span class="c1"># transform the test data to fit the model</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detectorbase</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;Dataset : balanced STD&quot;</span><span class="p">)</span>
+
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">prediction</span><span class="o">=</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_log_unbalanced</span><span class="p">)</span>
+<span class="c1"># false positives</span>
+<span class="n">fp_mask</span><span class="o">=</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">false_positives_features</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">fp_mask</span><span class="p">]</span>
+<span class="n">n_false_positive</span><span class="o">=</span><span class="n">false_positives_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;False positive count : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">))</span>
+<span class="c1"># choose N false positives and plot the corresponding sample</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">rpos</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">),</span><span class="n">N</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rpos</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">false positive samples&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;Log data&quot;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">### FFT</span>
+<span class="kn">import</span> <span class="nn">scipy.fftpack</span>
+<span class="c1"># transform data</span>
+<span class="k">def</span> <span class="nf">get_fft_transform</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">x_fft</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">N</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">fft_t</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,:],</span><span class="n">norm</span><span class="o">=</span><span class="s2">&quot;ortho&quot;</span><span class="p">)</span>
+        <span class="n">fft_t</span><span class="o">=</span><span class="mf">2.0</span><span class="o">/</span><span class="n">N</span>  <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fft_t</span><span class="p">[:</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">x_fft</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fft_t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_fft</span><span class="p">)</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Computing FFTs...&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+<span class="n">x_fft_balanced</span><span class="o">=</span><span class="n">get_fft_transform</span><span class="p">(</span><span class="n">x_log</span><span class="p">)</span>
+<span class="n">x_fft_unbalanced</span><span class="o">=</span><span class="n">get_fft_transform</span><span class="p">(</span><span class="n">x_log_unbalanced</span><span class="p">)</span>
+<span class="n">x_fft_original</span><span class="o">=</span><span class="n">get_fft_transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;done</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+<span class="c1"># feature standardization</span>
+<span class="n">mean_t</span><span class="p">,</span> <span class="n">std_t</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x_fft_balanced</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x_fft_balanced</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">x_fft_balanced</span><span class="o">=</span><span class="n">standardize_features</span><span class="p">(</span><span class="n">x_fft_balanced</span><span class="p">)</span>
+<span class="n">x_fft_original</span><span class="o">=</span><span class="p">(</span><span class="n">x_fft_original</span> <span class="o">-</span> <span class="n">mean_t</span><span class="p">)</span><span class="o">/</span><span class="n">std_t</span>
+
+<span class="c1"># create the classification model</span>
+<span class="n">prediction</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">0</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training, testing, predicting&quot;</span><span class="p">)</span>
+    <span class="n">detector</span><span class="o">=</span><span class="n">BCDetector</span><span class="p">(</span><span class="n">model_constructor</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="n">MyBinClass</span><span class="p">(</span><span class="mi">90</span><span class="p">))</span>
+    <span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_fft_balanced</span><span class="p">,</span> <span class="n">y_log</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.000001</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-12</span><span class="p">,</span>\
+             <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="c1"># false positives in the training data</span>
+    <span class="n">prediction</span><span class="o">=</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_fft_unbalanced</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span><span class="n">x_fft_unbalanced</span><span class="p">,</span> <span class="n">y_log_unbalanced</span><span class="p">,</span> <span class="s2">&quot;Dataset : fft&quot;</span><span class="p">)</span>
+
+<span class="c1"># false positives</span>
+<span class="n">fp_mask</span><span class="o">=</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y_log_unbalanced</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">false_positives_features</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">fp_mask</span><span class="p">]</span>
+<span class="n">n_false_positive</span><span class="o">=</span><span class="n">false_positives_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;False positive count : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">))</span>
+<span class="c1"># choose N false positives and plot the corresponding sample</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">6</span>
+<span class="n">rpos</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">),</span><span class="n">N</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">false_positives_features</span><span class="p">[</span><span class="n">rpos</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">false positive samples&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;FFT&quot;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">detectorbase</span><span class="o">=</span><span class="n">BCDetector</span><span class="p">(</span><span class="n">model_constructor</span><span class="o">=</span><span class="n">MyCNNBinClass</span><span class="p">)</span>
+<span class="n">detectorbase</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span> <span class="n">x_bal_stan</span><span class="p">,</span> <span class="n">y_balanced</span><span class="p">,</span><span class="n">patience</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">lr</span><span class="o">=.</span><span class="mi">0001</span><span class="p">)</span>
+<span class="n">prediction</span><span class="o">=</span><span class="n">detectorbase</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">0</span><span class="p">))</span>
+<span class="k">class</span> <span class="nc">Event</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">=</span><span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="o">=</span><span class="n">beg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">=</span><span class="n">end</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">begin</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Event(begin:</span><span class="si">{}</span><span class="s2">,end:</span><span class="si">{}</span><span class="s2">,state:</span><span class="si">{}</span><span class="s2">,len:</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="fm">__len__</span><span class="p">())</span>
+<span class="k">def</span> <span class="nf">prediction_to_catalogue</span><span class="p">(</span><span class="n">pred</span><span class="p">):</span>
+    <span class="n">events</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">curr_event</span><span class="o">=</span><span class="n">Event</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="c1">#print(i, pred[i],curr_event)</span>
+        <span class="k">if</span> <span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="n">curr_event</span><span class="o">.</span><span class="n">state</span><span class="p">:</span>
+            <span class="n">curr_event</span><span class="o">.</span><span class="n">end</span><span class="o">=</span><span class="n">i</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">curr_event</span><span class="o">.</span><span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_event</span><span class="p">)</span>
+            <span class="n">curr_event</span><span class="o">=</span><span class="n">Event</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">curr_event</span><span class="o">.</span><span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_event</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">events</span>
+<span class="n">events</span><span class="o">=</span><span class="n">prediction_to_catalogue</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Prediction shape : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of events : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)))</span>
+
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+    <span class="n">event_len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">event_len</span><span class="o">&gt;</span><span class="mi">120</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">state</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">[</span><span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">:</span><span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="o">+</span><span class="mi">90</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">[</span><span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">:</span><span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="o">+</span><span class="mi">90</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;false_pos_fft/</span><span class="si">{}</span><span class="s2">.png&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">))</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">MyCNNBinClassFFT</span><span class="p">(</span><span class="n">BinaryClassifier</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">kernel_dim</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MyCNNBinClassFFT</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dim</span><span class="o">=</span><span class="n">kernel_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">430</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dim</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">def</span> <span class="nf">reshape_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+<span class="c1"># create the classification model</span>
+<span class="n">detector</span><span class="o">=</span><span class="n">BCDetector</span><span class="p">(</span><span class="n">model_constructor</span><span class="o">=</span><span class="n">MyCNNBinClassFFT</span><span class="p">)</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_fft_balanced</span><span class="p">,</span> <span class="n">y_balanced</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.00001</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-12</span><span class="p">,</span><span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span><span class="n">x_fft_original</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;Dataset : fft&quot;</span><span class="p">)</span>
+
+<span class="c1"># false positives in the training data</span>
+<span class="n">prediction</span><span class="o">=</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_fft_original</span><span class="p">)</span>
+<span class="c1"># false positives</span>
+<span class="n">fp_mask</span><span class="o">=</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">false_positives_features</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">fp_mask</span><span class="p">]</span>
+<span class="n">n_false_positive</span><span class="o">=</span><span class="n">false_positives_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;False positive count : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">))</span>
+<span class="c1"># choose N false positives and plot the corresponding sample</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">12</span>
+<span class="n">rpos</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_false_positive</span><span class="p">),</span><span class="n">N</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">_</span><span class="o">=</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">false_positives_features</span><span class="p">[</span><span class="n">rpos</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">false positive samples&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;FFT&quot;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="BROUILLON">
+<h2>BROUILLON<a class="headerlink" href="#BROUILLON" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">check_false_positive</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">y_pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span>
+<span class="k">def</span> <span class="nf">get_prediction_state</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_pred</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">get_following_same_state</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">curr_state</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">pos_range</span><span class="o">=</span><span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">tol</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">a</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">latest_pos</span><span class="o">=</span><span class="n">i</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pos_range</span><span class="p">:</span>
+        <span class="n">state</span><span class="o">=</span><span class="n">get_prediction_state</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">p</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">state</span><span class="o">==</span><span class="n">curr_state</span><span class="p">):</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">latest_pos</span><span class="o">&lt;</span><span class="n">i</span><span class="o">+</span><span class="n">p</span><span class="p">:</span>
+                <span class="n">latest_pos</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="n">p</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">latest_pos</span><span class="p">,</span><span class="n">a</span>
+<span class="k">def</span> <span class="nf">group_consecutive_false_positives</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">n</span><span class="o">=</span><span class="n">y_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">groups</span><span class="o">=</span><span class="p">{(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">):[],(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">):[],(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">):[],(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">):[]}</span>
+    <span class="k">while</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">:</span>
+        <span class="n">prediction_state</span><span class="o">=</span><span class="n">get_prediction_state</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># check all following samples with the same state</span>
+        <span class="n">nextg</span><span class="o">=</span><span class="n">get_following_same_state</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">prediction_state</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">nextg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="o">+</span><span class="n">nextg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">i</span><span class="o">=</span><span class="n">nextg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">nextg</span><span class="o">=</span><span class="n">get_following_same_state</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">prediction_state</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="n">groups</span><span class="p">[</span><span class="n">prediction_state</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">groups</span>
+
+<span class="n">prediction_groups</span><span class="o">=</span><span class="n">group_consecutive_false_positives</span><span class="p">(</span><span class="n">y_predicted</span><span class="p">,</span> <span class="n">y_org</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Groups : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction_groups</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])))</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prediction_groups</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction_groups</span><span class="p">[</span><span class="n">k</span><span class="p">])))</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="n">prediction_groups</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]:</span>
+    <span class="c1"># get begining and end dates</span>
+    <span class="n">beg_dt</span><span class="o">=</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">fp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">end_dt</span><span class="o">=</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">fp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">180</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">end_dt</span><span class="o">-</span><span class="n">beg_dt</span><span class="o">&lt;</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+        <span class="k">continue</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">[</span><span class="n">beg_dt</span><span class="p">:</span><span class="n">end_dt</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;AL index&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;index </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2"> samples, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">fp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="nb">len</span><span class="p">(</span><span class="n">fp</span><span class="p">),</span><span class="n">end_dt</span><span class="o">-</span><span class="n">beg_dt</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="o">%</span><span class="k">matplotlib</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">[</span><span class="n">beg_dt</span><span class="p">:</span><span class="n">end_dt</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;AL index&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;index </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2"> samples, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">fp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="nb">len</span><span class="p">(</span><span class="n">fp</span><span class="p">),</span><span class="n">end_dt</span><span class="o">-</span><span class="n">beg_dt</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Naive binary classifier</a><ul>
+<li><a class="reference internal" href="#Submodules">Submodules</a><ul>
+<li><a class="reference internal" href="#Training-data">Training data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Data-description">Data description</a><ul>
+<li><a class="reference internal" href="#Feature-engineering">Feature engineering</a></li>
+<li><a class="reference internal" href="#Fitting-and-predicting">Fitting and predicting</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#The-classifier">The classifier</a></li>
+<li><a class="reference internal" href="#Training-the-model">Training the model</a></li>
+<li><a class="reference internal" href="#Prediction">Prediction</a></li>
+<li><a class="reference internal" href="#Defining-the-Detector-class">Defining the Detector class</a><ul>
+<li><a class="reference internal" href="#Class-balancing">Class balancing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Evaluation">Evaluation</a></li>
+<li><a class="reference internal" href="#False-positives">False positives</a></li>
+<li><a class="reference internal" href="#1D-CNN">1D CNN</a></li>
+<li><a class="reference internal" href="#BROUILLON">BROUILLON</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="feature_engineering.html"
+                        title="previous chapter">Feature engineering</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="binary_classifier_cnn.html"
+                        title="next chapter">Isolated substorm detection using binary classification - CNN</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/binary_classifier.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="binary_classifier_cnn.html" title="Isolated substorm detection using binary classification - CNN"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="feature_engineering.html" title="Feature engineering"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">isolated_substorms 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Alexandre Schulz.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

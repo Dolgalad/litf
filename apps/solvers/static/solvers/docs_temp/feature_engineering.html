@@ -1,0 +1,1657 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Feature engineering &#8212; isolated_substorms 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Naive binary classifier" href="binary_classifier.html" />
+    <link rel="prev" title="Welcome to isolated_substorms’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="binary_classifier.html" title="Naive binary classifier"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to isolated_substorms’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">isolated_substorms 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Feature-engineering">
+<h1>Feature engineering<a class="headerlink" href="#Feature-engineering" title="Permalink to this headline">¶</a></h1>
+<p>The performances of the binary classifier depend greatly on the type of data used for its training. In this notebook we will use a simple binary classifier and test various datasets to see if one of them stands out, either in terms of model performance or stability of the training process.</p>
+<p>We have previously tried two strategies for creating samples for our neural networks, each method is <em>window based</em> in that the prediction at time <code class="docutils literal notranslate"><span class="pre">t</span></code> is obtained by feeding a <em>window</em> of the timeseries around that time. The two stategies that were implemented so far are : - centered window at time <code class="docutils literal notranslate"><span class="pre">t</span></code> - window ending at time <code class="docutils literal notranslate"><span class="pre">t</span></code></p>
+<p>Moreover a sample was labeled <code class="docutils literal notranslate"><span class="pre">1</span></code> if time <code class="docutils literal notranslate"><span class="pre">t</span></code> belongs to one of the events furnished by visual inspection. These events represent the substorm onsets and are usually very short (couple minutes). This results in having two very imbalanced classes in the data.</p>
+<p>We take inspiration from the work on predicting presence of an Electric Vehicle based on the electric consumption found at : <a class="reference external" href="https://ilmonteux.github.io/EV_charging/">https://ilmonteux.github.io/EV_charging/</a> and give a sample the label <code class="docutils literal notranslate"><span class="pre">1</span></code> whenever the corresponding window contains an event. We hope to obtain better balanced classes.</p>
+<div class="section" id="Common-imports">
+<h2>Common imports<a class="headerlink" href="#Common-imports" title="Permalink to this headline">¶</a></h2>
+<p>For readability some functionalities were implemented in submodules that are imported now.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/dataset.py">isolated_substorms.dataset</a> : Load all available data.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/labels.py">isolated_substorms.labels</a> : Load all available labels.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/train_history.py">isolated_substorms.train_history</a> : Store the models training history for later analysis.</p>
+<p><a class="reference external" href="file:///home/aschulz/isolated_substorms/isolated_substorms/metrics.py">isolated_substorms.metrics</a> : F1 score and other metrics.</p>
+<p>Check the <strong class="program">isolated_substorms</strong> package.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+
+<span class="c1"># kNN</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+
+<span class="c1"># plotting utils</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sn</span>
+
+
+<span class="c1"># Data loader class</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="c1"># Label loader class</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.labels</span> <span class="kn">import</span> <span class="n">EventLabels</span>
+<span class="c1"># Autoencoder classes</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.train_history</span> <span class="kn">import</span> <span class="n">TrainHistory</span>
+<span class="c1"># f1 score</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
+<span class="c1"># data utilities</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.data_utils</span> <span class="kn">import</span> <span class="n">standardize_features</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Load-time-series-data">
+<h2>Load time series data<a class="headerlink" href="#Load-time-series-data" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># get the labels</span>
+<span class="n">labels</span><span class="o">=</span><span class="n">EventLabels</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of events         : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Label timespan           : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">timespan</span><span class="p">()))</span>
+
+<span class="c1"># get AL data</span>
+<span class="n">historical_data</span><span class="o">=</span><span class="n">Dataset</span><span class="p">()</span>
+<span class="c1"># keep only data for which we have labels</span>
+<span class="n">labeled_data</span><span class="o">=</span><span class="n">historical_data</span><span class="o">.</span><span class="n">get_timespan</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">timespan</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Labeled data shape       : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+<span class="n">p</span><span class="o">=</span><span class="mf">100.</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">historical_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Proportion of total data : </span><span class="si">{}</span><span class="s2"> %&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+<span class="n">labeled_data_mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">)</span>
+<span class="n">labeled_data_std</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean                     : </span><span class="si">{}</span><span class="s2"> nT&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labeled_data_mean</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Standard deviation       : </span><span class="si">{}</span><span class="s2"> nT&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labeled_data_std</span><span class="p">))</span>
+
+<span class="c1"># Normalize the series and set aside the original data for later</span>
+<span class="n">original_data</span><span class="o">=</span><span class="n">labeled_data</span>
+<span class="c1"># transform the data a little to make training easier</span>
+<span class="n">labeled_data</span> <span class="o">=</span> <span class="n">labeled_data</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">)</span>
+<span class="n">labeled_data</span><span class="o">=</span><span class="n">labeled_data</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span>
+<span class="n">labeled_data</span><span class="o">=</span><span class="p">(</span><span class="n">labeled_data</span> <span class="o">-</span> <span class="n">labeled_data_mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">labeled_data_std</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of events         : 76
+Label timespan           : 1992-10-13 06:27:26 -&gt; 1993-02-15 01:33:40
+Labeled data shape       : (179946,)
+Proportion of total data : 3.416106383657303 %
+Mean                     : -141.652167872584 nT
+Standard deviation       : 167.2879219136791 nT
+</pre></div></div>
+</div>
+<div class="section" id="Creating-samples">
+<h3>Creating samples<a class="headerlink" href="#Creating-samples" title="Permalink to this headline">¶</a></h3>
+<p>First we start by creating the datasets we want to compare. We have chosen to take a window size of <code class="docutils literal notranslate"><span class="pre">180</span></code> for our test.</p>
+<p>We will take care to create as many samples as there were observations in the input time series, filling missing values with the end values of the series when necessary.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">window_size</span><span class="o">=</span><span class="mi">180</span>
+<span class="n">h_w</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">window_size</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Centered-window">
+<h3>Centered window<a class="headerlink" href="#Centered-window" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">x_centered,</span> <span class="pre">y_centered</span></code> contain the input data to the prediction model and the corresponding labels.</p>
+<p><code class="docutils literal notranslate"><span class="pre">y_centered[i]==1</span></code> if the <code class="docutils literal notranslate"><span class="pre">i</span></code>-th sample of the original data belongs to a substorm event.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">make_windows</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">w_s</span><span class="p">):</span>
+    <span class="n">n</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="o">-</span><span class="n">w_s</span><span class="p">,</span> <span class="n">w_s</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">w_s</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">w_s</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">x</span>
+<span class="n">x_original</span><span class="o">=</span><span class="n">make_windows</span><span class="p">(</span><span class="n">original_data</span><span class="p">,</span> <span class="n">window_size</span><span class="p">)</span>
+<span class="n">x_windows</span><span class="o">=</span><span class="n">make_windows</span><span class="p">(</span><span class="n">labeled_data</span><span class="p">,</span> <span class="n">window_size</span><span class="p">)</span>
+<span class="n">x_windows</span><span class="o">=</span><span class="n">standardize_features</span><span class="p">(</span><span class="n">x_windows</span><span class="p">)</span>
+<span class="n">N</span><span class="o">=</span><span class="n">x_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># map the indexes to dates</span>
+<span class="n">t_centered</span><span class="o">=</span><span class="p">[</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">h_w</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="c1"># get labels</span>
+<span class="n">y_centered</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">labels</span><span class="o">.</span><span class="n">check_date</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">t_centered</span><span class="p">])</span>
+
+<span class="c1"># count classes</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classes:</span><span class="se">\n\t</span><span class="s2">1: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">0: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_centered</span><span class="o">==</span><span class="mi">1</span><span class="p">),</span> \
+                                         <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_centered</span><span class="o">==</span><span class="mi">0</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Classes:
+        1: 354
+        0: 179412
+</pre></div></div>
+</div>
+<p>Make labels for the second dataset : <code class="docutils literal notranslate"><span class="pre">y_event_presence[i]==1</span></code> if the window <code class="docutils literal notranslate"><span class="pre">[i-h_w,</span> <span class="pre">i+h_w]</span></code> contains a substorm event, where <code class="docutils literal notranslate"><span class="pre">h_w</span></code> is half the window size.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># half window size</span>
+<span class="n">h_w</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">window_size</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">t_d</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">h_w</span><span class="p">)</span>
+<span class="c1"># windows containing an event</span>
+<span class="n">y_event_presence</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">labels</span><span class="o">.</span><span class="n">check_interval</span><span class="p">(</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">h_w</span><span class="p">],</span>\
+                                                 <span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">h_w</span><span class="p">])</span>\
+                           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># count classes</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classes:</span><span class="se">\n\t</span><span class="s2">1: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">0: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_event_presence</span><span class="o">==</span><span class="mi">1</span><span class="p">),</span> \
+                                         <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_event_presence</span><span class="o">==</span><span class="mi">0</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Classes:
+        1: 11807
+        0: 167959
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Fitting-and-predicting">
+<h2>Fitting and predicting<a class="headerlink" href="#Fitting-and-predicting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="The-classifier">
+<h3>The classifier<a class="headerlink" href="#The-classifier" title="Permalink to this headline">¶</a></h3>
+<p>Use the same classifier as in <code class="docutils literal notranslate"><span class="pre">binary_classifier</span></code> notebook.</p>
+<p>This class can be imported from the <code class="docutils literal notranslate"><span class="pre">isolated_substorms.binary_classifier</span></code> module.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">isolated_substorms.binary_classifier</span> <span class="kn">import</span> <span class="n">BinaryClassifier</span>
+</pre></div>
+</div>
+</div>
+<p>For a first implementation we chose an exceedingly simple model : one layer network with a sigmoid activation function. The models input is a <code class="docutils literal notranslate"><span class="pre">180</span></code> size window and its output is composed of two values between 0 and 1 representing the <em>confidence</em> of the model in both classes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">MyBinClass</span><span class="p">(</span><span class="n">BinaryClassifier</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_size</span><span class="o">=</span><span class="n">window_size</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MyBinClass</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l1</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span><span class="mi">128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l2</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span><span class="mi">128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l3</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l3</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Loading-the-Detector-module-and-testing">
+<h3>Loading the Detector module and testing<a class="headerlink" href="#Loading-the-Detector-module-and-testing" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">BinaryClassifierDetector</span></code> is a member of the <code class="docutils literal notranslate"><span class="pre">isolated_substorms.binary_classifier</span></code> module.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">isolated_substorms.binary_classifier</span> <span class="kn">import</span> <span class="n">BinaryClassifierDetector</span>
+<span class="kn">from</span> <span class="nn">isolated_substorms.plot_utils</span> <span class="kn">import</span> <span class="n">plot_losses_and_confusion</span>
+
+</pre></div>
+</div>
+</div>
+<p>Test the <code class="docutils literal notranslate"><span class="pre">BinaryClassifierDetector</span></code> on each of the training sets.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># fit a detector on the centered data</span>
+
+<span class="n">detector</span> <span class="o">=</span> <span class="n">BinaryClassifierDetector</span><span class="p">(</span><span class="n">MyBinClass</span><span class="p">)</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_windows</span><span class="p">,</span><span class="n">y_centered</span><span class="p">,</span>\
+             <span class="n">lr</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>\
+             <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>\
+             <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-4</span><span class="p">,</span>\
+             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>\
+             <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training stop status : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_status</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">x_windows</span><span class="p">,</span> <span class="n">y_centered</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;centered&quot;</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Training stop status : validation score not improving. ending training
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_19_1.png" src="_images/feature_engineering_19_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># fit a detector on the event containing data</span>
+
+<span class="n">detector</span> <span class="o">=</span> <span class="n">BinaryClassifierDetector</span><span class="p">(</span><span class="n">MyBinClass</span><span class="p">)</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_windows</span><span class="p">,</span><span class="n">y_event_presence</span><span class="p">,</span>\
+             <span class="n">lr</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>\
+             <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>\
+             <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-4</span><span class="p">,</span>\
+             <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>\
+             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training stop status : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_status</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">x_windows</span><span class="p">,</span> <span class="n">y_event_presence</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;presence&quot;</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Training stop status : validation score not improving. ending training
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_20_1.png" src="_images/feature_engineering_20_1.png" />
+</div>
+</div>
+<p>By looking at the training results it is unclear which configuration yields the best results. Both models seem (in most cases) to converge towards a degenerate solution (always <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p>
+</div>
+<div class="section" id="Class-balancing">
+<h3>Class balancing<a class="headerlink" href="#Class-balancing" title="Permalink to this headline">¶</a></h3>
+<p>One of the classes is far more represented in the training data than the other class. We want to remedy this issue.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># equalize classes</span>
+<span class="k">def</span> <span class="nf">balance_classes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">weights</span><span class="p">):</span>
+    <span class="c1"># positive labels</span>
+    <span class="n">x_positive</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">n_positive</span><span class="o">=</span><span class="n">x_positive</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># negative labels</span>
+    <span class="n">x_negative</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># shuffle the negative labels</span>
+    <span class="n">x_negative</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">x_negative</span><span class="p">)</span>
+    <span class="c1"># concatenate positive and negative samples</span>
+    <span class="n">x_temp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">x_positive</span><span class="p">,</span><span class="n">x_negative</span><span class="p">[:</span><span class="n">n_positive</span><span class="p">]),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">y_temp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_positive</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_positive</span><span class="p">)),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">x_temp</span><span class="p">,</span><span class="n">y_temp</span><span class="p">)</span>
+<span class="n">x_balanced</span><span class="p">,</span><span class="n">y_balanced</span><span class="o">=</span><span class="n">balance_classes</span><span class="p">(</span><span class="n">x_windows</span><span class="p">,</span><span class="n">y_event_presence</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Balanced data shape :</span><span class="se">\n\t</span><span class="s2">x.shape : </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">y.shape : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_event_presence</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Balanced data shape :
+        x.shape : (179766, 180)
+        y.shape : (179766,)
+</pre></div></div>
+</div>
+<p>Train the model and predict, hope to see an improvement of the F1 score.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">detector</span> <span class="o">=</span>  <span class="n">BinaryClassifierDetector</span><span class="p">(</span><span class="n">MyBinClass</span><span class="p">)</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_balanced</span><span class="p">,</span><span class="n">y_balanced</span><span class="p">,</span>\
+             <span class="n">lr</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>\
+             <span class="n">patience</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>\
+             <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-5</span><span class="p">,</span>\
+             <span class="n">max_epochs</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>\
+             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_status</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span> <span class="n">x_balanced</span><span class="p">,</span><span class="n">y_balanced</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;balanced&quot;</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+validation increased, exceeded patience
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_24_1.png" src="_images/feature_engineering_24_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># prediction</span>
+<span class="n">prediction</span><span class="o">=</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_windows</span><span class="p">)</span>
+<span class="c1"># count each class</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Event count:</span><span class="se">\n\t</span><span class="s2">0: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">1: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)))</span>
+<span class="c1"># false positive features</span>
+<span class="n">fp_mask</span><span class="o">=</span><span class="p">(</span><span class="n">prediction</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y_event_presence</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">false_positive_features</span><span class="o">=</span><span class="n">x_windows</span><span class="p">[</span><span class="n">fp_mask</span><span class="p">]</span>
+<span class="n">false_positive_time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t_centered</span><span class="p">)[</span><span class="n">fp_mask</span><span class="p">]</span>
+<span class="n">false_positive_count</span><span class="o">=</span><span class="n">false_positive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;False positive count : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">false_positive_count</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Event count:
+        0: 136676
+        1: 43090
+False positive count : 33265
+</pre></div></div>
+</div>
+<p>Useless, try majority vote.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">majority_vote</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">voters</span><span class="p">):</span>
+    <span class="n">n</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ans</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">voters</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">voters</span><span class="p">:</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">ans</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ans</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">mc</span><span class="o">=</span><span class="n">majority_vote</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+
+<span class="c1"># transform the prediction to a catalogue of events</span>
+<span class="k">def</span> <span class="nf">prediction_to_catalogue</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">n</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">event_catalogue</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">current_event</span><span class="o">=</span><span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">current_event</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">current_event</span><span class="o">=</span><span class="n">i</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">event_catalogue</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">current_event</span><span class="p">,</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">current_event</span><span class="o">=</span><span class="kc">None</span>
+    <span class="k">return</span> <span class="n">event_catalogue</span>
+<span class="n">substorm_events</span><span class="o">=</span><span class="n">prediction_to_catalogue</span><span class="p">(</span><span class="n">mc</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of events : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">substorm_events</span><span class="p">)))</span>
+
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of events : 182
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Detection-results">
+<h2>Detection results<a class="headerlink" href="#Detection-results" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">event_lengths</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="o">-</span><span class="n">a</span> <span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">substorm_events</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Event length distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;event length (min)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">event_lengths</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_29_0.png" src="_images/feature_engineering_29_0.png" />
+</div>
+</div>
+<p>Lets remove all events that last less then 180 minutes or more then 240 minutes. How many events are we left with ?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">substorm_events</span> <span class="o">=</span> <span class="p">[[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">substorm_events</span> <span class="k">if</span> <span class="mi">180</span><span class="o">&lt;=</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="o">&lt;=</span><span class="mi">240</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of events : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">substorm_events</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of events : 33
+</pre></div></div>
+</div>
+<p>Convert indexes to dates and plot the features corresponding to substorm events.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">event_dates</span><span class="o">=</span><span class="p">[[</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">a</span><span class="p">],</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">b</span><span class="p">]]</span> \
+                <span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">substorm_events</span><span class="p">]</span>
+<span class="n">td</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+
+<span class="c1">#%matplotlib notebook</span>
+<span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">event_dates</span><span class="p">:</span>
+    <span class="c1"># check if the interval contains a substorm event</span>
+    <span class="n">interval_contains_label</span><span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">check_interval</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">td</span><span class="p">,</span><span class="n">b</span><span class="o">+</span><span class="n">td</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">original_data</span><span class="p">[</span><span class="n">a</span><span class="o">-</span><span class="n">td</span><span class="p">:</span><span class="n">b</span><span class="o">+</span><span class="n">td</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">original_data</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">],</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interval_contains_label</span><span class="p">:</span>
+        <span class="k">for</span> <span class="p">[</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">]</span> <span class="ow">in</span> <span class="n">labels</span><span class="o">.</span><span class="n">get_interval</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">td</span><span class="p">,</span><span class="n">b</span><span class="o">+</span><span class="n">td</span><span class="p">):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;AL (nT)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;event </span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span><span class="s2"> : label : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">interval_contains_label</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_0.png" src="_images/feature_engineering_33_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_1.png" src="_images/feature_engineering_33_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_2.png" src="_images/feature_engineering_33_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_3.png" src="_images/feature_engineering_33_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_4.png" src="_images/feature_engineering_33_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_5.png" src="_images/feature_engineering_33_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_6.png" src="_images/feature_engineering_33_6.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_7.png" src="_images/feature_engineering_33_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_8.png" src="_images/feature_engineering_33_8.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_9.png" src="_images/feature_engineering_33_9.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_10.png" src="_images/feature_engineering_33_10.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_11.png" src="_images/feature_engineering_33_11.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_12.png" src="_images/feature_engineering_33_12.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_13.png" src="_images/feature_engineering_33_13.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_14.png" src="_images/feature_engineering_33_14.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_15.png" src="_images/feature_engineering_33_15.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_16.png" src="_images/feature_engineering_33_16.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_17.png" src="_images/feature_engineering_33_17.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_18.png" src="_images/feature_engineering_33_18.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_19.png" src="_images/feature_engineering_33_19.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_20.png" src="_images/feature_engineering_33_20.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_21.png" src="_images/feature_engineering_33_21.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_22.png" src="_images/feature_engineering_33_22.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_23.png" src="_images/feature_engineering_33_23.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_24.png" src="_images/feature_engineering_33_24.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_25.png" src="_images/feature_engineering_33_25.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_26.png" src="_images/feature_engineering_33_26.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_27.png" src="_images/feature_engineering_33_27.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_28.png" src="_images/feature_engineering_33_28.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_29.png" src="_images/feature_engineering_33_29.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_30.png" src="_images/feature_engineering_33_30.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_31.png" src="_images/feature_engineering_33_31.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_33_32.png" src="_images/feature_engineering_33_32.png" />
+</div>
+</div>
+<div class="section" id="Substorm-catalog">
+<h3>Substorm catalog<a class="headerlink" href="#Substorm-catalog" title="Permalink to this headline">¶</a></h3>
+<p>Convert the predictions to a catalog of events that can be read in AMDA.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># print the resulting catalogue</span>
+<span class="k">def</span> <span class="nf">print_catalog</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+    <span class="k">for</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">e</span><span class="p">]</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">),</span>\
+                         <span class="n">e</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)))</span>
+<span class="n">print_catalog</span><span class="p">(</span><span class="n">event_dates</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1992-10-21T15:50:00 1992-10-21T19:18:00
+1992-11-01T01:34:00 1992-11-01T04:41:00
+1992-11-05T05:58:00 1992-11-05T09:43:00
+1992-11-09T22:41:00 1992-11-10T02:05:00
+1992-11-11T22:21:00 1992-11-12T01:34:00
+1992-11-12T08:16:00 1992-11-12T11:57:00
+1992-11-20T19:48:00 1992-11-20T23:17:00
+1992-11-26T08:04:00 1992-11-26T11:05:00
+1992-11-28T07:19:00 1992-11-28T10:48:00
+1992-11-29T10:49:00 1992-11-29T14:38:00
+1992-12-06T13:56:00 1992-12-06T17:46:00
+1992-12-10T07:51:00 1992-12-10T11:22:00
+1992-12-24T02:48:00 1992-12-24T06:16:00
+1992-12-26T06:49:00 1992-12-26T10:47:00
+1992-12-28T07:29:00 1992-12-28T10:49:00
+1992-12-31T06:55:00 1992-12-31T10:42:00
+1993-01-03T08:06:00 1993-01-03T11:39:00
+1993-01-11T07:14:00 1993-01-11T10:55:00
+1993-01-12T09:32:00 1993-01-12T13:05:00
+1993-01-18T08:13:00 1993-01-18T11:27:00
+1993-01-18T19:35:00 1993-01-18T22:48:00
+1993-01-20T23:38:00 1993-01-21T02:46:00
+1993-01-26T09:46:00 1993-01-26T13:36:00
+1993-01-27T03:19:00 1993-01-27T06:45:00
+1993-01-27T10:11:00 1993-01-27T13:54:00
+1993-01-28T03:07:00 1993-01-28T06:08:00
+1993-01-29T05:46:00 1993-01-29T09:00:00
+1993-02-03T17:19:00 1993-02-03T21:16:00
+1993-02-05T15:45:00 1993-02-05T18:58:00
+1993-02-06T19:39:00 1993-02-06T22:48:00
+1993-02-07T03:32:00 1993-02-07T06:32:00
+1993-02-09T08:21:00 1993-02-09T12:05:00
+1993-02-11T01:41:00 1993-02-11T04:52:00
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Correcting-labels">
+<h2>Correcting labels<a class="headerlink" href="#Correcting-labels" title="Permalink to this headline">¶</a></h2>
+<p>Some samples have incorect labels and hinder the learning process. In this step we check the events that were predicted by our model and note some additional events. These events will be added to our collection of labels and the model will be trained over the new dataset.</p>
+<p>Each date <code class="docutils literal notranslate"><span class="pre">t</span></code> in <code class="docutils literal notranslate"><span class="pre">new_labels</span></code> corresponds to the onset of a substorm (in my subjective opinion). We add the interval <code class="docutils literal notranslate"><span class="pre">[t,</span> <span class="pre">t</span> <span class="pre">+</span> <span class="pre">5</span> <span class="pre">min]</span></code> to the label collection.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># additional onset times defined here</span>
+<span class="n">new_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1992-10-16T00:00:00&quot;</span><span class="p">,</span><span class="s2">&quot;1992-10-17T05:30:00&quot;</span><span class="p">,</span>\
+<span class="s2">&quot;1992-11-01T21:45:00&quot;</span><span class="p">,</span><span class="s2">&quot;1992-11-08T22:05:00&quot;</span><span class="p">,</span><span class="s2">&quot;1992-11-16T15:15:00&quot;</span><span class="p">,</span>\
+<span class="s2">&quot;1992-12-11T07:50:00&quot;</span><span class="p">,</span><span class="s2">&quot;1992-12-11T14:30:00&quot;</span><span class="p">,</span><span class="s2">&quot;1992-12-14T19:50:00&quot;</span><span class="p">,</span>\
+<span class="s2">&quot;1992-12-19T11:30:00&quot;</span><span class="p">,</span><span class="s2">&quot;1992-12-23T03:30:00&quot;</span><span class="p">,</span><span class="s2">&quot;1992-12-23T09:15:00&quot;</span><span class="p">,</span>\
+<span class="s2">&quot;1992-12-28T06:30:00&quot;</span><span class="p">,</span><span class="s2">&quot;1993-01-06T21:40:00&quot;</span><span class="p">,</span><span class="s2">&quot;1993-01-07T09:05:00&quot;</span><span class="p">,</span>\
+<span class="s2">&quot;1993-01-07T14:30:00&quot;</span><span class="p">,</span><span class="s2">&quot;1993-01-15T09:55:00&quot;</span><span class="p">,</span><span class="s2">&quot;1993-01-28T18:40:00&quot;</span><span class="p">,</span>\
+<span class="s2">&quot;1993-01-29T16:50:00&quot;</span><span class="p">,</span><span class="s2">&quot;1993-02-12T04:40:00&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Add the events to the label collection, each event has a duration of <code class="docutils literal notranslate"><span class="pre">5</span></code> minutes.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># add labels to labels</span>
+<span class="n">td</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">new_labels</span><span class="p">:</span>
+    <span class="n">a</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">=</span><span class="n">a</span><span class="o">+</span><span class="n">td</span>
+    <span class="n">labels</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">])</span>
+<span class="c1"># make training labels</span>
+<span class="n">y_event_presence2</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">labels</span><span class="o">.</span><span class="n">check_interval</span><span class="p">(</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">h_w</span><span class="p">],</span>\
+                                                 <span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">h_w</span><span class="p">])</span>\
+                           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># count classes</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classes:</span><span class="se">\n\t</span><span class="s2">1: </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">0: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_event_presence</span><span class="o">==</span><span class="mi">1</span><span class="p">),</span> \
+                                         <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_event_presence</span><span class="o">==</span><span class="mi">0</span><span class="p">)))</span>
+
+<span class="c1"># balance the resulting dataset</span>
+<span class="n">x_balanced2</span><span class="p">,</span><span class="n">y_balanced2</span><span class="o">=</span><span class="n">balance_classes</span><span class="p">(</span><span class="n">x_windows</span><span class="p">,</span><span class="n">y_event_presence2</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Balanced data shape :</span><span class="se">\n\t</span><span class="s2">x.shape : </span><span class="si">{}</span><span class="se">\n\t</span><span class="s2">y.shape : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_balanced2</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_balanced2</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Classes:
+        1: 11807
+        0: 167959
+Balanced data shape :
+        x.shape : (30264, 180)
+        y.shape : (30264,)
+</pre></div></div>
+</div>
+<p>Now create a new <code class="docutils literal notranslate"><span class="pre">BinaryClassifierDetector</span></code> object and train it.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">detector</span> <span class="o">=</span>  <span class="n">BinaryClassifierDetector</span><span class="p">(</span><span class="n">MyBinClass</span><span class="p">)</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_balanced2</span><span class="p">,</span><span class="n">y_balanced2</span><span class="p">,</span>\
+             <span class="n">lr</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>\
+             <span class="n">patience</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>\
+             <span class="n">validation_tol</span><span class="o">=</span><span class="mf">1.e-5</span><span class="p">,</span>\
+             <span class="n">max_epochs</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>\
+             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training stop status : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">detector</span><span class="o">.</span><span class="n">train_history</span><span class="o">.</span><span class="n">stop_status</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plot_losses_and_confusion</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span> <span class="n">x_balanced2</span><span class="p">,</span><span class="n">y_balanced2</span><span class="p">,</span> <span class="s2">&quot;Dataset : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;new labels&quot;</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Training stop status : validation increased, exceeded patience
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_41_1.png" src="_images/feature_engineering_41_1.png" />
+</div>
+</div>
+<p>The model has a better F1 score than its previous instance. Lets view the detection results. We plot the distribution of event lengths. Only events whose duration is between <code class="docutils literal notranslate"><span class="pre">180</span></code> and <code class="docutils literal notranslate"><span class="pre">240</span></code> minutes are kept.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">prediction</span><span class="o">=</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_windows</span><span class="p">)</span>
+<span class="n">mc</span><span class="o">=</span><span class="n">majority_vote</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+<span class="n">substorm_events</span><span class="o">=</span><span class="n">prediction_to_catalogue</span><span class="p">(</span><span class="n">mc</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of events : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">substorm_events</span><span class="p">)))</span>
+
+<span class="n">event_lengths</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="o">-</span><span class="n">a</span> <span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">substorm_events</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Event length distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;event length (min)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">event_lengths</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">substorm_events</span> <span class="o">=</span> <span class="p">[[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">substorm_events</span> <span class="k">if</span> <span class="mi">180</span><span class="o">&lt;=</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="o">&lt;=</span><span class="mi">240</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of events : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">substorm_events</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total number of events : 206
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_43_1.png" src="_images/feature_engineering_43_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of events : 36
+</pre></div></div>
+</div>
+<p>Get the event catalog and print it.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">catalog</span><span class="o">=</span><span class="p">[[</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">a</span><span class="p">],</span><span class="n">labeled_data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">b</span><span class="p">]]</span> \
+                <span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">substorm_events</span><span class="p">]</span>
+<span class="n">print_catalog</span><span class="p">(</span><span class="n">catalog</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1992-10-17T05:32:00 1992-10-17T08:36:00
+1992-10-21T15:49:00 1992-10-21T19:27:00
+1992-11-01T21:39:00 1992-11-02T00:53:00
+1992-11-12T08:21:00 1992-11-12T11:36:00
+1992-11-19T03:55:00 1992-11-19T07:42:00
+1992-11-26T08:02:00 1992-11-26T11:15:00
+1992-12-05T02:44:00 1992-12-05T06:26:00
+1992-12-05T06:53:00 1992-12-05T10:19:00
+1992-12-11T07:50:00 1992-12-11T10:54:00
+1992-12-11T14:02:00 1992-12-11T17:34:00
+1992-12-14T19:32:00 1992-12-14T23:00:00
+1992-12-15T09:42:00 1992-12-15T12:45:00
+1992-12-15T20:00:00 1992-12-15T23:54:00
+1992-12-17T07:21:00 1992-12-17T10:37:00
+1992-12-19T18:08:00 1992-12-19T21:17:00
+1992-12-23T03:38:00 1992-12-23T07:09:00
+1992-12-24T02:51:00 1992-12-24T06:02:00
+1992-12-26T07:06:00 1992-12-26T10:47:00
+1992-12-28T06:42:00 1992-12-28T10:03:00
+1992-12-31T07:20:00 1992-12-31T10:23:00
+1993-01-06T04:29:00 1993-01-06T08:17:00
+1993-01-06T21:26:00 1993-01-07T00:27:00
+1993-01-07T14:16:00 1993-01-07T17:45:00
+1993-01-09T06:16:00 1993-01-09T09:42:00
+1993-01-11T07:30:00 1993-01-11T10:48:00
+1993-01-12T19:07:00 1993-01-12T22:46:00
+1993-01-17T18:00:00 1993-01-17T21:11:00
+1993-01-18T19:16:00 1993-01-18T22:35:00
+1993-01-20T23:39:00 1993-01-21T02:40:00
+1993-01-26T09:53:00 1993-01-26T13:37:00
+1993-01-28T03:05:00 1993-01-28T06:09:00
+1993-01-29T05:55:00 1993-01-29T08:55:00
+1993-02-03T17:36:00 1993-02-03T21:22:00
+1993-02-04T10:54:00 1993-02-04T13:54:00
+1993-02-06T19:42:00 1993-02-06T22:46:00
+1993-02-11T01:00:00 1993-02-11T04:43:00
+</pre></div></div>
+</div>
+<div class="section" id="Viewing-the-results">
+<h3>Viewing the results<a class="headerlink" href="#Viewing-the-results" title="Permalink to this headline">¶</a></h3>
+<p>Each event is represented below. In blue is the <code class="docutils literal notranslate"><span class="pre">AL</span> <span class="pre">index</span></code> value around the event. In red is represented the event that was detected by the model.</p>
+<p>If the interval contains a substorm event label then the extreme values of its time period are represented as vertical lines.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">td</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="ow">in</span> <span class="n">event_dates</span><span class="p">:</span>
+    <span class="c1"># check if the interval contains a substorm event</span>
+    <span class="n">interval_contains_label</span><span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">check_interval</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">td</span><span class="p">,</span><span class="n">b</span><span class="o">+</span><span class="n">td</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">original_data</span><span class="p">[</span><span class="n">a</span><span class="o">-</span><span class="n">td</span><span class="p">:</span><span class="n">b</span><span class="o">+</span><span class="n">td</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">original_data</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">],</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interval_contains_label</span><span class="p">:</span>
+        <span class="k">for</span> <span class="p">[</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">]</span> <span class="ow">in</span> <span class="n">labels</span><span class="o">.</span><span class="n">get_interval</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">td</span><span class="p">,</span><span class="n">b</span><span class="o">+</span><span class="n">td</span><span class="p">):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;AL (nT)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;event </span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span><span class="s2"> : label : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">interval_contains_label</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_0.png" src="_images/feature_engineering_47_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_1.png" src="_images/feature_engineering_47_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_2.png" src="_images/feature_engineering_47_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_3.png" src="_images/feature_engineering_47_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_4.png" src="_images/feature_engineering_47_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_5.png" src="_images/feature_engineering_47_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_6.png" src="_images/feature_engineering_47_6.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_7.png" src="_images/feature_engineering_47_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_8.png" src="_images/feature_engineering_47_8.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_9.png" src="_images/feature_engineering_47_9.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_10.png" src="_images/feature_engineering_47_10.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_11.png" src="_images/feature_engineering_47_11.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_12.png" src="_images/feature_engineering_47_12.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_13.png" src="_images/feature_engineering_47_13.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_14.png" src="_images/feature_engineering_47_14.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_15.png" src="_images/feature_engineering_47_15.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_16.png" src="_images/feature_engineering_47_16.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_17.png" src="_images/feature_engineering_47_17.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_18.png" src="_images/feature_engineering_47_18.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_19.png" src="_images/feature_engineering_47_19.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_20.png" src="_images/feature_engineering_47_20.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_21.png" src="_images/feature_engineering_47_21.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_22.png" src="_images/feature_engineering_47_22.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_23.png" src="_images/feature_engineering_47_23.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_24.png" src="_images/feature_engineering_47_24.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_25.png" src="_images/feature_engineering_47_25.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_26.png" src="_images/feature_engineering_47_26.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_27.png" src="_images/feature_engineering_47_27.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_28.png" src="_images/feature_engineering_47_28.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_29.png" src="_images/feature_engineering_47_29.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_30.png" src="_images/feature_engineering_47_30.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_31.png" src="_images/feature_engineering_47_31.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/feature_engineering_47_32.png" src="_images/feature_engineering_47_32.png" />
+</div>
+</div>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {}, "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Feature engineering</a><ul>
+<li><a class="reference internal" href="#Common-imports">Common imports</a></li>
+<li><a class="reference internal" href="#Load-time-series-data">Load time series data</a><ul>
+<li><a class="reference internal" href="#Creating-samples">Creating samples</a></li>
+<li><a class="reference internal" href="#Centered-window">Centered window</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Fitting-and-predicting">Fitting and predicting</a><ul>
+<li><a class="reference internal" href="#The-classifier">The classifier</a></li>
+<li><a class="reference internal" href="#Loading-the-Detector-module-and-testing">Loading the Detector module and testing</a></li>
+<li><a class="reference internal" href="#Class-balancing">Class balancing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Detection-results">Detection results</a><ul>
+<li><a class="reference internal" href="#Substorm-catalog">Substorm catalog</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Correcting-labels">Correcting labels</a><ul>
+<li><a class="reference internal" href="#Viewing-the-results">Viewing the results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to isolated_substorms’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="binary_classifier.html"
+                        title="next chapter">Naive binary classifier</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/feature_engineering.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="binary_classifier.html" title="Naive binary classifier"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to isolated_substorms’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">isolated_substorms 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Alexandre Schulz.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

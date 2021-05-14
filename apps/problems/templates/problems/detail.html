@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+  <h1>Problem ({{ problem.id }}) : {{ problem.name }}</h1>
+  {% include 'problems/description_block.html' %}
+  <hr/>
+
+  {% include 'codes/file_table_form.html' %}
+  <hr/>
+
+  {% include 'problems/solver_block.html' %}
+  <hr/>
+  
+  
+  {% include 'problems/postprocess_block.html' %}
+  <hr/>
+
+
+{% endblock main_block %}

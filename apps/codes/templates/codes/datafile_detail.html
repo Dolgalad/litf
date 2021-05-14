@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+  <h1>File ({{ file.id }}) : {{ file.datafile.name }}</h1>
+  Path : {{ file.datafile.path }}<br/>
+  Put file description here
+
+  {% if used_by_code %}
+  <h2>Used by</h2>
+  {% for code in used_by_code %}
+    <a href="{% url "code_detail" code.id %}">{{ code.name }}</a><br/>
+  {% endfor %}
+  {% endif %}
+
+
+{% endblock main_block %}

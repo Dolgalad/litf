@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+<h2>Code creation</h2>
+<form method="post" role="form" enctype="multipart/form-data">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" id="submit_code" name="submit_code" value="Submit"/>
+<input type="reset" id="reset_code" name="reset_code" value="Reset"/>
+<a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock main_block %}

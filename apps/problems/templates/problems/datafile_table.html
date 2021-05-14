@@ -1,0 +1,20 @@
+{% if perms.problem %}
+<form role="form" method="post">
+{% endif %}
+
+<table>
+	<thead>
+		{% include 'problems/datafile_table_hrow.html' %}
+	</thead>
+	<tbody>
+		{% for file in files %}
+		  {% include 'problems/datafile_table_row.html' with file=file %}
+		{% endfor %}
+	</tbody>
+</table>
+
+{% if perms.problem %}
+<input type="submit" name="add_file" id="add_file" value="Add"/>
+<input type="submit" name="delete_file" id="delete_file" value="Delete"/>
+</form>
+{% endif %}

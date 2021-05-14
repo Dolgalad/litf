@@ -1,0 +1,16 @@
+<h2>Solvers</h2>
+  <form role="form" method="post">
+    {% csrf_token %}
+    {% include 'solvers/table.html' %}
+    {% if solver_add_permission %}
+    <input type="submit" name="solver_add" value="Add"/>
+    {% endif %}
+    {% if solver_edit_permission %}
+    <input type="submit" name="solver_edit" value="Edit"/>
+    {% endif %}
+    {% if solver_delete_permission %}
+    <input type="submit" name="solver_delete" value="Delete"/>
+    {% endif %}
+    <input type="reset" value="Reset"/>
+  </form>
+

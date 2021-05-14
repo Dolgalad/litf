@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+  <h1>Solver({{ solver.id }}) : {{ solver.name }}</h1>
+  <h2>Implementation</h2>
+    {{ solver.implementation.code }}
+    <hr/>
+
+
+{% endblock main_block %}

@@ -1,0 +1,16 @@
+<table>
+	<thead>
+		<tr><th></th><th>#</th><th>name</th><th>date</th><th>author</th></tr>
+	</thead>
+	<tbody>
+		{% for code in codes %}
+		  <tr>
+			  <td><input type="checkbox" name="{{prefix}}_id_{{ code.id }}"></td>
+			  <td>{{ code.id }}</td>
+			  <td><a href="/code/{{ code.id }}">{{ code.name }}</a></td>
+			  <td>{{ code.date }}</td>
+			  <td>{{ code.author }}</td>
+		  </tr>
+	{% endfor %}
+	</tbody>
+</table>

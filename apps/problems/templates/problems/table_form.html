@@ -1,0 +1,8 @@
+<form role="form" method="post">
+	{% csrf_token %}
+	{% include 'problems/table.html' %}
+	<input type="submit" name="problem_add" value="Add"/>
+	<input type="submit" name="problem_edit" value="Edit"/>
+	<input type="submit" name="problem_delete" value="Delete"/>
+	<input type="reset" value="Reset"/>
+</form>

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+<h2>Solver editing</h2>
+<form method="post" role="form">
+	{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" name="submit" value="Save"/>
+<input type="reset" name="reset" value="Reset"/>
+<a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock main_block %}

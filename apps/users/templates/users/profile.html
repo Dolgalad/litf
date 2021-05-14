@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+<h1>Welcome {{ user.username }}</h1>
+<a href="{% url 'logout' %}">Logout</a><br/>
+<a href="{% url 'problem_add' %}">Add problem</a><br/>
+<a href="{% url 'code_add' %}">Add code</a><br/>
+
+
+
+You are the author of {{ problems|length }} Problems and {{ solvers|length }} Solvers.
+{% block user_content %}
+
+<h2>Your problems</h2>
+{% include 'problems/table_form.html' %}
+<hr/>
+
+<h2>Your classes</h2>
+{% include 'codes/table_form.html' with prefix="code" add_permission=code_add_permission edit_permission=code_edit_permission delete_permission=code_edit_permission %}
+<hr/>
+
+<h2>Your files</h2>
+{% include 'codes/file_table_form.html' %}
+<hr/>
+
+{% endblock user_content %}
+{% endblock main_block %}

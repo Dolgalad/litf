@@ -1,0 +1,48 @@
+<doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title_block %}LITF{% endblock %}</title>
+    <style>{% block style_block %}{% endblock %}</style>
+
+    {% load static %}
+    <script src="{% static 'solvers/codemirror/codemirror-5.61.0/lib/codemirror.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'solvers/header.css' %}">
+    <link rel="stylesheet" href="{% static 'solvers/codemirror/codemirror-5.61.0/lib/codemirror.css' %}">
+    <!--<script src="{% static 'solvers/codemirror/codemirror-5.61.0/addon/runmode/runmode-standalone.js' %}"></script>-->
+    <script src="{% static 'solvers/codemirror/codemirror-5.61.0/mode/python/python.js' %}"></script>
+    <script src="{% static 'solvers/codemirror/codemirror-5.61.0/mode/markdown/markdown.js' %}"></script>
+
+  </head>
+  <body>
+    <header class="header">
+      <div class="header">
+	      <a href="/" class="logo"><img src={% static 'solvers/substorm_img.jpeg' %} alt="Substorms" width="200"></a>
+        <div class="header-right">
+          <a class="active" href="/">Home</a>
+	  <!--if user is logged in then display link to profile, else login link-->
+	  {% if user.is_authenticated %}
+	    <a href="/profile">Profile</a>
+	  {% else %}
+	    <a href="/login">Login</a>
+	  {% endif %}
+	  <a href="/problem/index">Index</a>
+	  <a href="/admin">Admin</a>
+          <a href="#contact">Contact</a>
+          <a href="#about">About</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+	    <section>{% block main_block %}Main block{% endblock %}</section>
+	    <aside>{% block aside_block %}{% endblock %}</aside>
+
+
+      </aside>
+    </main>
+
+    <footer>{% block footer_block %}Footer block{% endblock %}</footer>
+  </body>
+</html>

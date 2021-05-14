@@ -1,0 +1,10 @@
+<table>
+	<thead>
+		{% include 'problems/table_hrow.html' %}
+	</thead>
+	<tbody>
+		{% for problem in problems %}
+		  {% include 'problems/table_row.html' with problem=problem %}
+		{% endfor %}
+	</tbody>
+</table>

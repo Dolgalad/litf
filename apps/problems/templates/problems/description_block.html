@@ -1,0 +1,24 @@
+{% load problems_tags %}
+
+<h2>Description</h2>
+
+<style>
+.description-div {
+  padding: 1em;
+  border-width: 2px;
+  border-color: black;
+  border-style: solid;
+}
+</style>
+
+There are {{ problem.solvers|length }} solvers submitted for this problem.
+
+<div class="description-div">
+	{% autoescape off %}
+	{{ problem.description }}
+	{% endautoescape %}
+</div>
+
+<h3>Input/output description</h3>
+Add input/output description here.
+

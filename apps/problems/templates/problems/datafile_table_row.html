@@ -1,0 +1,11 @@
+<tr>
+	{% if perms.problem %}
+	<td><input type="checkbox"></td>
+	{% endif %}
+	<td>{{ file.name }}</td>
+	<td>{{ file.path }}</td>
+	<td>{{ file.size }}</td>
+	<td>{{ file.creation_date }}</td>
+	<td>{{ file.author }}</td>
+	<td>{{ file.flags }}</td>
+</tr>

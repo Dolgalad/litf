@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+<h2>Problem creation</h2>
+<form method="post">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" id="submit_problem" name="submit_problem" value="Submit"/>
+<input type="reset" id="reset_problem" name="reset_problem" value="Reset"/>
+<a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock main_block %}

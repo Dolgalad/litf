@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block main_block %}
+
+  <h2>Code index</h2>
+  <ul>
+	  {% for code in object_list %}
+	    <li>{{ code }}</li>
+	    {% endfor %}
+  </ul>
+{% endblock main_block %}
