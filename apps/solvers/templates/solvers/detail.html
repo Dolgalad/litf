@@ -3,8 +3,21 @@
 {% block main_block %}
   <h1>Solver({{ solver.id }}) : {{ solver.name }}</h1>
   <h2>Implementation</h2>
+    <pre><code id="solver_implementation_code">{{ solver.implementation.code }}</code></pre>
     {{ solver.implementation.code }}
     <hr/>
+
+    <script type="text/javascript">
+		window.onload = function() {
+			var codeElement = document.getElementById("solver_implementation_code");
+
+			codeElement.classList.add('cm-s-default');
+			var code = codeElement.innerText;
+			console.log(code);
+			codeElement.innerHTML="";
+			CodeMirror.runMode(code, 'python', codeElement);
+		};
+	</script>
 
 
 {% endblock main_block %}

@@ -3,8 +3,32 @@
 {% block main_block %}
   <h1>Code ({{ code.id }}) : {{ code.name }}</h1>
   <h2>Implementation</h2>
-    {{ code.code }}
+       <textarea readonly rows="14" id="object_code" name="object_code">{{ code.code }}</textarea>	       
     <hr/>
+    <!--<script type="text/javascript">
+		window.onload = function() {
+			var codeElement = document.getElementById("object_code");
+
+			codeElement.classList.add('cm-s-default');
+			var code = codeElement.innerText;
+			console.log(code);
+			codeElement.innerHTML="";
+			CodeMirror.runMode(code, 'python', codeElement);
+		};
+    </script>-->
+	<script>
+		var editor=CodeMirror.fromTextArea(document.getElementById("object_code"), {
+			mode: {name: "python",
+				version: 3,
+				singleLineStringErrors: false},
+			lineNumbers: true,
+			indentUnit: 2,
+			matchBrackets: true,
+			readOnly: true,
+		});
+                editor.setSize(null, 100);
+	</script>
+
 
 
   <h2>Files</h2>

@@ -25,13 +25,9 @@ class AddView(CreateView):
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
     def get_form_class(self, *args, **kwargs):
+        print("codes.views.AddView.get_form_class")
         fc=super().get_form_class(*args,**kwargs)
-        print([k for k in fc.__dict__])
-        print([k for k in fc.__dict__["_meta"].__dict__])
         #fc._meta.widgets={"code": forms.Textarea}
-        print(fc._meta.widgets)
-        print(self.get_form_kwargs())
-        print(super().get_form_class())
         return fc
     def get_form(self, *args, **kwargs):
         return super().get_form(*args,**kwargs)
@@ -58,8 +54,6 @@ class AddView(CreateView):
 class DetailView(TemplateView):
     template_name="codes/detail.html"
     def post(self,request,pk):
-        print("in codemodel DetailView : post data : {}".format(request.POST))
-        print("pk : {}".format(pk))
         if "datafile_add" in request.POST:
             return HttpResponseRedirect(reverse("code_datafile_add", kwargs={"pk":pk}))
         if "datafile_edit" in request.POST:
@@ -76,7 +70,6 @@ class DetailView(TemplateView):
         pk=kwargs["pk"]
         context=super().get_context_data(**kwargs)
         context["code"]=CodeModel.objects.get(id=pk)
-        print("DetailView.get_context_data : context {}".format(context))
         return context
 
 class EditView(UpdateView):
@@ -94,6 +87,12 @@ class EditView(UpdateView):
         self.object=form.save()
         code_updated_task.delay(self.object.data())
         return super().form_valid(form)
+    def get_form_kwargs(self):
+        print("codes.views.EditView.get_form_kwargs()")
+        a=super().get_form_kwargs()
+        return a
+    def get_initial(self):
+        return super().get_initial()
         
 
 
@@ -106,7 +105,6 @@ class DataAddView(CreateView):
     def get_initial(self):
         return {"date": timezone.now(), "author":self.request.user}
     def form_valid(self, form):
-        print("SAVING FILE")
         self.object = form.save()
         # add the datafile object to the code
         # try getting the parent CodeModel
@@ -153,5 +151,4 @@ class DataDetailView(TemplateView):
         context=super().get_context_data(**kwargs)
         context["file"]=DataFileModel.objects.get(id=kwargs["pk"])
         context["used_by_code"]=[cm for cm in CodeModel.objects.all() if context["file"] in cm.files.all()]
-        print("FILE USED BY : {}".format(context["used_by_code"]))
         return context

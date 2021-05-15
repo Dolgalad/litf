@@ -5,6 +5,8 @@
 """
 import os
 import re
+import json
+import pickle as pkl
 
 from libs.utils import debug_print
 
@@ -12,7 +14,8 @@ from libs.utils import debug_print
 from .status import CodeStatus
 # virtual environements
 from libs.venv.utils import VirtualEnv
-
+# function parameter parser
+from libs.code.syntax import *
 # Some settings
 VENV_CREATION_PATH="virtual_environements"
 
@@ -37,18 +40,30 @@ class CodeManager:
         venv_dir=os.path.join(VENV_CREATION_PATH,code["name"])
         venv=VirtualEnv(venv_dir=venv_dir)
         # get class parameters
-        class_params=get_params(class_name, code["code"])
-        # get requirements
-        print("REQUIREMENTS : ")
-        print(code["requirements"])
-        rs=venv.install_requirements(code["requirements"])
-        print("venv.install_requirements : {}".format(rs))
+        class_params=get_function_arguments(class_name, code["code"])
+        print("CLASS PARAMS : {}".format(class_params))
+        # prepare input data for testing the code
+
+        if code["requirements"]:
+            # get requirements
+            print("REQUIREMENTS : ")
+            print(code["requirements"])
+            rs=venv.install_requirements(code["requirements"])
+            print("venv.install_requirements : {}".format(rs))
         # save code in virtual environement
         sc=venv.save_code(code["code"])
         print("venv.save_code : {}".format(sc))
         # run the testing script
         ts=venv.exec_file(os.path.join(venv_dir,"test_script.py"), "{} code".format(code["name"]))
         print("venv.exec_file : {}".format(ts))
+        # read the test_output.json file before deleting the virtual environement
+        output_filename=os.path.join(venv_dir, "test_output.json")
+        print("searching for : {} , exists :{}".format(output_filename, os.path.exists(output_filename)))
+        if os.path.exists(output_filename):
+            print("TEST OUTPUT")
+            print(pkl.load(open(output_filename,"rb")))
+        else:
+            print("{} not found")
 
         # remove venv
         venv.delete_env()

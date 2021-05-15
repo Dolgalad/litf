@@ -24,7 +24,6 @@ class AddView(CreateView):
     model=SolverModel
     form_class=SolverModelForm
     def get_initial(self):
-        print("KWARGS : {}".format(self.kwargs))
         return {"date":timezone.now(), "author":self.request.user, "problem":ProblemModel.objects.get(id=self.kwargs["problem_id"])}
     def form_valid(self,form):
         self.object=form.save(commit=False)

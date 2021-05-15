@@ -21,9 +21,7 @@ from .tasks import problem_submitted_task, problem_updated_task
 class DetailView(TemplateView):
     template_name="problems/detail.html"
     def post(self, request, pk):
-        print("post data : {}".format(request.POST))
         if "cancel" in request.POST:
-            print("CANCELING : {}".format(request.META["HTTP_REFERER"]))
             return HttpResponseRedirect(request.META["HETTP_REFERER"])
         if "datafile_add" in request.POST:
             return HttpResponseRedirect(reverse("problem_datafile_add", kwargs={"pk":pk}))
@@ -50,15 +48,12 @@ class DetailView(TemplateView):
             delete_solvers(ids, request.user)
 
         if "postprocess_add" in request.POST:
-            print("ADD POSTPROCESS")
             return HttpResponseRedirect(reverse("postprocess_add", kwargs={"pk":pk}))
         if "postprocess_delete" in request.POST:
-            print("DELETE POSTPROCESS")
             ids=get_checked_postprocesses(request.POST)
             if len(ids):
                 delete_postprocesses(ids, request.user)
         if "postprocess_edit" in request.POST:
-            print("EDIT POSTPROCESS")
             ids=get_checked_postprocesses(request.POST)
             if len(ids):
                 if len(ids)>1:
@@ -71,7 +66,6 @@ class DetailView(TemplateView):
         context["problem"]=problem
         context["files"]=problem.input_data.all()
         context["solvers"]=SolverModel.objects.filter(problem=problem)
-        print([k for k in problem.__dict__])
         context["postprocesses"]=problem.postprocess.all()
         # permissions
         context["datafile_add_permission"]=(self.request.user.is_superuser or \
