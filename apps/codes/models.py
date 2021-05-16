@@ -25,11 +25,12 @@ class CodeModel(models.Model):
     name=models.CharField(max_length=settings.MAX_NAME_LENGTH)
     code=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
     requirements=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
-    dependencies=models.ManyToManyField("self", blank=True, related_name="code_dependencies")
+    dependencies=models.ManyToManyField("self", symmetrical=False,blank=True, related_name="code_dependencies")
     files=models.ManyToManyField(DataFileModel, blank=True, related_name="code_files")
     author=models.ForeignKey(User, on_delete=models.CASCADE)
     date=models.DateTimeField()
-    
+    def get_execution_results(self):
+        return ExecutionResultModel.objects.filter(implementation=self)
     def get_absolute_url(self):
         return reverse("code_detail", kwargs={"pk": self.pk})
     def dependency_count(self):
@@ -69,6 +70,8 @@ class CodeModel(models.Model):
             print(errors.CODEMODEL_CODE_EMPTY)
             return a
         return a+self.code
+    def code_empty(self):
+        return len(self.code)==0
     def __str__(self):
         return self.name
     def data(self):
@@ -78,11 +81,11 @@ class CodeModel(models.Model):
                 "date":self.date}
 class ExecutionResultModel(models.Model):
     implementation=models.ForeignKey(CodeModel, on_delete=models.CASCADE)
-    input_data=models.ForeignKey(DataFileModel, on_delete=models.CASCADE)
+    input_data=models.ForeignKey(DataFileModel, on_delete=models.CASCADE, blank=True, null=True)
     output_data=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
-    status=models.IntegerField(default=1)
-    start_time=models.DateTimeField()
-    stop_time=models.DateTimeField()
+    status=models.IntegerField(default=-1)
+    start_time=models.DateTimeField(blank=True,null=True)
+    stop_time=models.DateTimeField(blank=True,null=True)
     stdout=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
     errors=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
     def data(self):

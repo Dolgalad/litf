@@ -9,4 +9,22 @@
 <input type="reset" name="reset" value="Reset"/>
 <a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
 </form>
+
+	<script>
+		var code_editor = CodeMirror.fromTextArea(document.getElementById("{{form.code.auto_id}}"),{
+			mode: {name: "python",
+				version: 3,
+				singleLineStringErrors: false},
+			lineNumbers: true,
+			indentUnit: 2,
+			matchBrackets: true,
+		});
+                code_editor.setSize(null, 200);
+                var req_editor = CodeMirror.fromTextArea(document.getElementById("{{form.requirements.auto_id}}"),{
+			mode: null,
+			lineNumbers: true,
+		});
+                req_editor.setSize(null,200);
+
+	</script>
 {% endblock main_block %}

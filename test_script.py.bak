@@ -95,7 +95,7 @@ def save_output(output):
 
 def declaration_test(code, g, l, stdout_buffer):
     try:
-        exec(code, g)
+        exec(code, g,l)
         #exec(code)
     except Exception as e:
         save_output(err_output(DECLARATION_ERROR, e, g, l, stdout_buffer.getvalue()))
@@ -124,48 +124,40 @@ def load_constr_args(g,l,stdout_buffer,ct):
             exit(exit_code(CONSTRUCTOR_INPUT_LOAD_ERROR))
     return in_args,in_kwargs
 
-def function_instantiation_test(name,g,l,stdout_buffer,ct):
+def function_instantiation_test(name,l,g,stdout_buffer,ct):
     # instantiation test
     try:
-        f=eval(name, g)
+        f=eval(name, g, l)
         #f=eval(name)
     except Exception as e:
         test_output=err_output(INSTANTIATION_ERROR,e,g,l,stdout_buffer.getvalue(),ct)
         save_output(test_output)
         exit(exit_code(INSTANTIATION_ERROR))
     return f
-
-def context_add_vars(vars_dict, context):
-    a=[]
-    for k in vars_dict:
-        t=k
-        while t in context:
-            t=t+"a"
-        a.append(t)
-        context[t]=vars_dict[k]
-    return tuple(a)
- 
 def class_instantiation_test(constr_f, c_args, c_kwargs, g, l, buf,ct):
     # instantiation test
     instance=None
     try:
-        new_keys=context_add_vars({"constr_f":constr_f,"c_args":c_args,"c_kwargs":c_kwargs},g)
-        instance=eval("{}(*{},**{})".format(*new_keys),g)
+        instance=constr_f(*c_args,**c_kwargs)
     except Exception as e:
         test_output=err_output(CLASS_INSTANTIATION_ERROR,e,g,l,stdout_buffer.getvalue(),ct)
         save_output(test_output)
         exit(exit_code(CLASS_INSTANTIATION_ERROR))
     return instance
 
-   
-def execution_test(f,args,kwargs,g,l,stdout_buffer,ct):
+
+def execution_test(f,args,kwargs,l,g,stdout_buffer,ct):
     y=None
     ti,tf=None,None
     try:
-        # add the arguments to the context
-        new_keys=context_add_vars({"f":f,"args":args,"kwargs":kwargs},g)
+        for k in g:
+            if not k in globals():
+                globals()[k]=g[k]
+        for k in l:
+            if not k in locals():
+                locals()[k]=l[k]
         ti=datetime.datetime.now()
-        y=eval("{}(*{},**{})".format(*new_keys),g)
+        y=f(*args,**kwargs)
         tf=datetime.datetime.now()
     except Exception as e:
         save_output(err_output(EXECUTION_ERROR,e,g,l,stdout_buffer.getvalue(),ct))
@@ -187,9 +179,6 @@ if __name__=="__main__":
     if not os.path.exists("code.py"):
         exit(exit_code(MISSING_CODE_FILE))
     code=load_code()
-
-    # create an empty context
-    context_g, context_l={},{}
 
     # store globals and locals keys
     glo,loc=[k for k in globals()], [k for k in locals()]
@@ -217,43 +206,43 @@ if __name__=="__main__":
         with io.StringIO() as buf, redirect_stdout(buf):
             glo,loc=[k for k in globals()], [k for k in locals()]
             # declaration code execution
-            declaration_test(code, context_g, context_l, buf)
+            declaration_test(code, globals(), locals(), buf)
 
             # search for <name> in the globals dictionary
             # if <name> isn't contained in globals then exit with
             # NAME_NOT_IN_CONTEXT error
-            code_type=context_test(name, context_g, context_l, buf)
+            code_type=context_test(name, globals(), locals(), buf)
             if code_type==FUNC_TYPE:
                 # load input args
-                args,kwargs=load_input_args(context_g,context_l,buf,code_type)
+                args,kwargs=load_input_args(globals(),locals(),buf,code_type)
                 # function instantiation test
-                f=function_instantiation_test(name,context_g,context_l,buf,code_type)
+                f=function_instantiation_test(name,globals(),locals(),buf,code_type)
                 # execution test
-                output,ti,tf=execution_test(f,args,kwargs,context_g,context_l,buf,code_type)
+                output,ti,tf=execution_test(f,args,kwargs,globals(),locals(),buf,code_type)
             elif code_type==CLASS_TYPE:
                 # load constructor args
-                c_args,c_kwargs=load_constr_args(context_g,context_l,buf,code_type)
+                c_args,c_kwargs=load_constr_args(globals(),locals(),buf,code_type)
                 # load input args
-                i_args,i_kwargs=load_input_args(context_g,context_l,buf,code_type)
+                i_args,i_kwargs=load_input_args(globals(),locals(),buf,code_type)
                 # constructor instantiation test
-                constructor_f=function_instantiation_test(name,context_g,context_l, buf,code_type)
+                constructor_f=function_instantiation_test(name,globals(), locals(), buf,code_type)
                 # class instantiation test
-                instance=class_instantiation_test(constructor_f, c_args,c_kwargs, context_g,context_l, buf,code_type)
+                instance=class_instantiation_test(constructor_f, c_args,c_kwargs, globals(), locals(), buf,code_type)
                 # we could add a execution test but we would need to know which method to test
                 # when testing a solver we would need the instance to be callable or have a solve
                 # method.
                 if hasattr(instance,"__call__"):
-                    output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, context_g,context_l, buf,code_type)
+                    output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, globals(), locals(), buf,code_type)
                 
             else:
                 print("Unknown type code")
-                save_output(err_output(UNKWN_CODE_TYPE,context_g,context_l))
+                save_output(err_output(UNKWN_CODE_TYPE,globals(),locals()))
                 exit(exit_code(UNKWN_CODE_TYPE))
 
             # execution was a success, save and exit
             test_output={"error_code":exit_code(SUCCESS),\
-                         "globals":[k for k in context_g],\
-                         "locals":[k for k in context_l],\
+                         "globals":[k for k in globals() if not k in glo],\
+                         "locals":[k for k in locals() if not k in loc],\
                          "stdout":buf.getvalue(),\
                          "type":code_type}
             if not output is None:

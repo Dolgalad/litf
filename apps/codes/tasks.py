@@ -3,14 +3,14 @@ from celery import shared_task
 from libs.code.manager import CodeManager
 from libs.file.manager import FileManager
 @shared_task
-def code_submitted_task(code):
-    print("code_submitted_task : {}".format(code))
-    CodeManager.check_code_status(code)
+def code_submitted_task(code_id):
+    print("code_submitted_task : {}".format(code_id))
+    CodeManager.check_code_status(code_id)
 
 @shared_task
-def code_updated_task(code):
-    print("code_updated_task : {}".format(code))
-    CodeManager.check_code_status(code)
+def code_updated_task(code_id):
+    print("code_updated_task : {}".format(code_id))
+    CodeManager.check_code_status(code_id)
 
 @shared_task
 def datafile_submitted_task(datafile):

@@ -16,6 +16,8 @@ from .status import CodeStatus
 from libs.venv.utils import VirtualEnv
 # function parameter parser
 from libs.code.syntax import *
+# import CodeModel
+from apps.codes.models import CodeModel,ExecutionResultModel
 # Some settings
 VENV_CREATION_PATH="virtual_environements"
 
@@ -34,34 +36,67 @@ def get_params(c_name, c_code):
     return {}
 class CodeManager:
     @staticmethod
-    def check_code_status(code):
-        class_name=code["name"]
+    def check_code_status(code_id):
+        # get the CodeModel object
+        cm=CodeModel.objects.get(id=code_id)
+        class_name=cm.name
+        requirements=cm.get_requirements()
+        code=cm.get_code()
+
+        cm_data=cm.data()
+        
         # create a virtual instrument
-        venv_dir=os.path.join(VENV_CREATION_PATH,code["name"])
+        venv_dir=os.path.join(VENV_CREATION_PATH,class_name)
         venv=VirtualEnv(venv_dir=venv_dir)
         # get class parameters
-        class_params=get_function_arguments(class_name, code["code"])
-        print("CLASS PARAMS : {}".format(class_params))
+        class_params=get_function_arguments(class_name, code)
         # prepare input data for testing the code
 
-        if code["requirements"]:
+        if requirements:
             # get requirements
-            print("REQUIREMENTS : ")
-            print(code["requirements"])
-            rs=venv.install_requirements(code["requirements"])
-            print("venv.install_requirements : {}".format(rs))
+            rs=venv.install_requirements(requirements)
         # save code in virtual environement
-        sc=venv.save_code(code["code"])
-        print("venv.save_code : {}".format(sc))
+        sc=venv.save_code(code)
         # run the testing script
-        ts=venv.exec_file(os.path.join(venv_dir,"test_script.py"), "{} code".format(code["name"]))
-        print("venv.exec_file : {}".format(ts))
+        ts=venv.exec_file(os.path.join(venv_dir,"test_script.py"), "{} code".format(class_name))
         # read the test_output.json file before deleting the virtual environement
         output_filename=os.path.join(venv_dir, "test_output.json")
-        print("searching for : {} , exists :{}".format(output_filename, os.path.exists(output_filename)))
         if os.path.exists(output_filename):
             print("TEST OUTPUT")
-            print(pkl.load(open(output_filename,"rb")))
+            test_output=pkl.load(open(output_filename,"rb"))
+            print(test_output)
+
+            # get output
+            output=None
+            ti,tf=None,None
+            stdout,err=None,None
+            if "output" in test_output:
+                output=test_output["output"]
+            if "start_dt" in test_output:
+                ti=test_output["start_dt"]
+            if "stop_dt" in test_output:
+                tf=test_output["stop_dt"]
+            if "stdout" in test_output:
+                stdout=test_output["stdout"]
+            if "error" in test_output:
+                err=test_output["error"]
+            # remove all previous execution tests
+            el=ExecutionResultModel.objects.filter(implementation=cm)
+            for e in el:
+                e.delete()
+            # save the results in the database as an ExecutionResultModel object
+            erm=ExecutionResultModel.objects.create(implementation=cm,\
+                                                    output_data=output,\
+                                                    status=test_output["error_code"],\
+                                                    start_time=ti,\
+                                                    stop_time=tf,\
+                                                    stdout=stdout,\
+                                                    errors=err)
+            erm.save()
+            # set the corresponding CodeModel status flag
+            cm.status=test_output["error_code"]
+            cm.save()
+            print("Saved ExecutionResultModel")
         else:
             print("{} not found")
 

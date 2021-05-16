@@ -5,35 +5,25 @@
   <h1>Code ({{ code.id }}) : {{ code.name }}</h1>
   <a href="{% url 'code_edit' code.id %}">Edit</a><br/>
   <h2>Implementation</h2>
-       <textarea readonly rows="14" id="object_code" name="object_code">{{ code.code }}</textarea>	       
-    <hr/>
-    <!--<script type="text/javascript">
-		window.onload = function() {
-			var codeElement = document.getElementById("object_code");
+      {% include 'codes/code_textarea.html' with code=code.code %}
+      
+      {% if requirements %}
+        <h3>Requirements</h3>
+        {% include 'codes/requirements_table.html' %}
+      {% endif %}
 
-			codeElement.classList.add('cm-s-default');
-			var code = codeElement.innerText;
-			console.log(code);
-			codeElement.innerHTML="";
-			CodeMirror.runMode(code, 'python', codeElement);
-		};
-    </script>-->
-	<script>
-		var editor=CodeMirror.fromTextArea(document.getElementById("object_code"), {
-			mode: {name: "python",
-				version: 3,
-				singleLineStringErrors: false},
-			lineNumbers: true,
-			indentUnit: 2,
-			matchBrackets: true,
-			readOnly: true,
-		});
-                editor.setSize(null, 200);
-	</script>
-
-
+      {% if code.dependencies.all %}
+        <h3>Dependencies</h3>
+	{% include 'codes/dependency_table.html' with dependencies=code.dependencies.all %}
+      {% endif %}
 
   <h2>Files</h2>
   {% include 'codes/file_table_form.html' with files=code.files.all %}
   <hr/>
+
+  {% if execution_results %}
+  <h2>Execution</h2>
+    {% include 'codes/execution_results_table.html' %}
+    <hr/>
+  {% endif %}
 {% endblock main_block %}

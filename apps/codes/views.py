@@ -40,7 +40,7 @@ class AddView(CreateView):
         self.object.author=self.request.user
         self.object.date=timezone.now()
         self.object.save()
-        code_submitted_task.delay(self.object.data())
+        code_submitted_task.delay(self.object.id)
         return super().form_valid(form)
     def get_context_data(self,**kwargs):
         context=super().get_context_data(**kwargs)
@@ -69,7 +69,13 @@ class DetailView(TemplateView):
     def get_context_data(self,**kwargs):
         pk=kwargs["pk"]
         context=super().get_context_data(**kwargs)
-        context["code"]=CodeModel.objects.get(id=pk)
+        cm=CodeModel.objects.get(id=pk)
+        context["code"]=cm
+        if not cm.requirements is None:
+            context["requirements"]=str(cm.requirements).split("\n")
+        er=cm.get_execution_results()
+        if len(er):
+            context["execution_results"]=er
         return context
 
 class EditView(UpdateView):
@@ -85,7 +91,7 @@ class EditView(UpdateView):
         return context
     def form_valid(self, form):
         self.object=form.save()
-        code_updated_task.delay(self.object.data())
+        code_updated_task.delay(self.object.id)
         return super().form_valid(form)
     def get_form_kwargs(self):
         print("codes.views.EditView.get_form_kwargs()")
@@ -116,9 +122,9 @@ class DataAddView(CreateView):
             codem=CodeModel.objects.get(id=self.kwargs["pk"])
             codem.files.add(self.object)
             codem.save()
-            code_updated_task.delay(codem.data())
+            code_updated_task.delay(codem.id)
         else:
-            datafile_submitted_task.delay(self.object.data())
+            datafile_submitted_task.delay(self.object.id)
 
         return HttpResponseRedirect(self.get_success_url())
     def get_context_data(self,**kwargs):
@@ -144,7 +150,7 @@ class DataEditView(UpdateView):
     def form_valid(self, form):
         self.object=form.save(commit=False)
         self.object.save()
-        datafile_updated_task.delay(self.object.data())
+        datafile_updated_task.delay(self.object.id)
         return super().form_valid(form)
 
 
