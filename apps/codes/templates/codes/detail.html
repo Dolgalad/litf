@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block main_block %}
+
   <h1>Code ({{ code.id }}) : {{ code.name }}</h1>
+  <a href="{% url 'code_edit' code.id %}">Edit</a><br/>
   <h2>Implementation</h2>
        <textarea readonly rows="14" id="object_code" name="object_code">{{ code.code }}</textarea>	       
     <hr/>
@@ -26,7 +28,7 @@
 			matchBrackets: true,
 			readOnly: true,
 		});
-                editor.setSize(null, 100);
+                editor.setSize(null, 200);
 	</script>
 
 

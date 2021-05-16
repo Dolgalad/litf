@@ -92,7 +92,10 @@ class EditView(UpdateView):
         a=super().get_form_kwargs()
         return a
     def get_initial(self):
-        return super().get_initial()
+        context=super().get_initial()
+        context["author"]=self.request.user
+        print("in EditView.get_initial : {}".format(context))
+        return context
         
 
 
