@@ -18,6 +18,8 @@ from libs.venv.utils import VirtualEnv
 from libs.code.syntax import *
 # import CodeModel
 from apps.codes.models import CodeModel,ExecutionResultModel
+# import SolverModel
+from apps.solvers.models import SolverModel
 # Some settings
 VENV_CREATION_PATH="virtual_environements"
 
@@ -36,7 +38,7 @@ def get_params(c_name, c_code):
     return {}
 class CodeManager:
     @staticmethod
-    def check_code_status(code_id):
+    def check_code_status(code_id, check_type="code", input_data=[]):
         # get the CodeModel object
         cm=CodeModel.objects.get(id=code_id)
         class_name=cm.name
@@ -61,8 +63,11 @@ class CodeManager:
         files=cm.get_filenames()
         print("FILES : {}".format(files))
         venv.move_files(files)
+        venv.move_input_data(input_data)
+        print("done moving files")
         # run the testing script
-        ts=venv.exec_file(os.path.join(venv_dir,"test_script.py"), "{} code".format(class_name))
+        ts=venv.exec_file(os.path.join(venv_dir,"test_script.py"), "{} {}".format(class_name,check_type))
+        print("done running test_script.py")
         # read the test_output.json file before deleting the virtual environement
         output_filename=os.path.join(venv_dir, "test_output.json")
         if os.path.exists(output_filename):
@@ -75,7 +80,7 @@ class CodeManager:
             ti,tf=None,None
             stdout,err=None,None
             if "output" in test_output:
-                output=test_output["output"]
+                output=str(test_output["output"])
             if "start_dt" in test_output:
                 ti=test_output["start_dt"]
             if "stop_dt" in test_output:
@@ -89,7 +94,17 @@ class CodeManager:
             for e in el:
                 e.delete()
             # save the results in the database as an ExecutionResultModel object
-            erm=ExecutionResultModel.objects.create(implementation=cm,\
+            if len(input_data):
+                erm=ExecutionResultModel.objects.create(implementation=cm,\
+                                                    output_data=output,\
+                                                    status=test_output["error_code"],\
+                                                    start_time=ti,\
+                                                    stop_time=tf,\
+                                                    stdout=stdout,\
+                                                    errors=err)
+
+            else:
+                erm=ExecutionResultModel.objects.create(implementation=cm,\
                                                     output_data=output,\
                                                     status=test_output["error_code"],\
                                                     start_time=ti,\
@@ -102,14 +117,17 @@ class CodeManager:
             cm.save()
             print("Saved ExecutionResultModel")
         else:
-            print("{} not found")
+            print("{} not found".format(output_filename))
 
         # remove venv
         venv.delete_env()
         return CodeStatus.UNCHECKED
     @staticmethod
-    def check_solver_status(code):
-        return CodeStatus.UNCHECKED
+    def check_solver_status(solver_id):
+        solver=SolverModel.objects.get(id=solver_id)
+        # get list of input data files
+        input_data=[f.datafile.path for f in solver.problem.input_data.all()]
+        return CodeManager.check_code_status(solver.implementation.id,check_type="code", input_data=input_data)
 
     @staticmethod
     def get_globals(code=None):

@@ -5,6 +5,7 @@
 			<th>start</th>
 			<th>stop</th>
 			<th>status</th>
+			<th>output</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -14,6 +15,7 @@
 			<td>{{exe.start_time}}</td>
 			<td>{{exe.stop_time}}</td>
 			<td>{{exe.status}}</td>
+			<td><a href="{% url 'output_download' exe.id %}">(output)</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>

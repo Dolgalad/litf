@@ -1,23 +1,14 @@
 {% extends 'base.html' %}
 
 {% block main_block %}
-  <h1>Solver({{ solver.id }}) : {{ solver.name }}</h1>
-  <h2>Implementation</h2>
-    <pre><code id="solver_implementation_code">{{ solver.implementation.code }}</code></pre>
-    {{ solver.implementation.code }}
+<h1>Solver ({{ solver.id }}) {{ solver.name }} for Problem ({{solver.problem.id}}) <a href="{% url 'problem_detail' solver.problem.id %}">{{solver.problem.name}}</a></h1>
+  <h2>Implementation [Code <a href="{% url 'code_detail' solver.implementation.id %}">{{solver.implementation.name}}</a>]</h2>
+    {% include 'codes/code_textarea.html' with code=solver.implementation.code %}
     <hr/>
+  {% if solutions %}
+  <h2>Solutions</h2>
+    {% include 'codes/execution_results_table.html' with execution_results=solutions %}
+  {% endif %}
 
-    <script type="text/javascript">
-		window.onload = function() {
-			var codeElement = document.getElementById("solver_implementation_code");
-
-			codeElement.classList.add('cm-s-default');
-			var code = codeElement.innerText;
-			console.log(code);
-			codeElement.innerHTML="";
-			CodeMirror.runMode(code, 'python', codeElement);
-		};
-	</script>
-
-
+    
 {% endblock main_block %}

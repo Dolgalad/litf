@@ -7,6 +7,7 @@ from .forms import SolverModelForm
 # my models 
 from .models import SolverModel
 from apps.problems.models import ProblemModel
+from apps.codes.models import ExecutionResultModel
 
 # tasks
 from .tasks import solver_submitted_task, solver_updated_task
@@ -16,7 +17,10 @@ class DetailView(TemplateView):
     template_name="solvers/detail.html"
     def get_context_data(self,**kwargs):
         context=super().get_context_data(**kwargs)
+        solver=SolverModel.objects.get(id=kwargs["pk"])
         context["solver"]=SolverModel.objects.get(id=kwargs["pk"])
+        # get list of ExecutionResultModel object obtained with this solvers implementation
+        context["solutions"]=ExecutionResultModel.objects.filter(implementation=solver.implementation)
         return context
 
 class AddView(CreateView):
@@ -31,7 +35,7 @@ class AddView(CreateView):
         self.object.date=timezone.now()
         self.object.problem=ProblemModel.objects.get(id=self.kwargs["problem_id"])
         self.object.save()
-        solver_submitted_task.delay(self.object.data())
+        solver_submitted_task.delay(self.object.id)
         return super().form_valid(form)
     def get_context_data(self, **kwargs):
         context=super().get_context_data(**kwargs)
@@ -48,7 +52,7 @@ class EditView(UpdateView):
     def form_valid(self, form):
         self.object=form.save(commit=False)
         self.object.save()
-        solver_updated_task.delay(self.object.data())
+        solver_updated_task.delay(self.object.id)
         return super().form_valid(form)
     def get_context_data(self, **kwargs):
         context=super().get_context_data(**kwargs)

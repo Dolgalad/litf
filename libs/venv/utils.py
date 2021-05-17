@@ -69,3 +69,8 @@ class VirtualEnv:
             base_name=os.path.basename(f)
             target_name=os.path.join(self.path,base_name)
             os.system("cp {} {}".format(f,target_name))
+    def move_input_data(self, files):
+        for f in files:
+            base_name=os.path.basename(f)
+            target_name=os.path.join(self.path,"input.pkl")
+            os.system("cp {} {}".format(f, target_name))

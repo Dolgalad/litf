@@ -6,6 +6,9 @@ from .views import DataAddView, DataEditView, DataDetailView
 # my models
 from .models import CodeModel
 
+# output download view
+from .views import output_download_view
+
 class CodeListView(ListView):
     model=CodeModel
 
@@ -19,4 +22,7 @@ urlpatterns = [
         path("<int:pk>/data_add", DataAddView.as_view(), name="code_datafile_add"),
         path("data_edit/<int:pk>/", DataEditView.as_view(), name="datafile_edit"),
         path("data/<int:pk>/", DataDetailView.as_view(), name="datafile_detail"),
+
+        # result download
+        path("output/<int:exe_id>/", output_download_view, name="output_download"),
         ]

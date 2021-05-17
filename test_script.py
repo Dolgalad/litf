@@ -109,7 +109,11 @@ def load_input_args(g,l,stdout_buffer,ct):
     in_args,in_kwargs=(),{}
     if os.path.exists(INPUT_FILENAME):
         try:
-            in_args,in_kwargs=pkl.load(open(INPUT_FILENAME,"rb"))
+            in_args=pkl.load(open(INPUT_FILENAME,"rb"))
+            if isinstance(in_args, tuple):
+                in_args,in_kwargs=in_args
+                return in_args, in_kwargs
+            return (in_args,),{}
         except Exception as e:
             save_output(err_output(INPUT_LOAD_ERROR,e,g,l,stdout_buffer.getvalue(),ct))
             exit(exit_code(INPUT_LOAD_ERROR))

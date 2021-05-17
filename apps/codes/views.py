@@ -2,15 +2,20 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.utils import timezone
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django import forms
 
+import tempfile
+import os
+from io import StringIO
+from wsgiref.util import FileWrapper
+
 # my forms
 from .forms import CodeModelForm
 # my models
-from .models import CodeModel, DataFileModel
+from .models import CodeModel, DataFileModel, ExecutionResultModel
 
 # tasks
 from .tasks import code_submitted_task, code_updated_task, datafile_submitted_task, datafile_updated_task
@@ -161,3 +166,20 @@ class DataDetailView(TemplateView):
         context["file"]=DataFileModel.objects.get(id=kwargs["pk"])
         context["used_by_code"]=[cm for cm in CodeModel.objects.all() if context["file"] in cm.files.all()]
         return context
+
+def getsize(f):
+    p=f.tell()
+    f.seek(0,os.SEEK_END)
+    s=f.tell()
+    f.seek(p)
+    return s
+def output_download_view(request,exe_id):
+    file_content=ExecutionResultModel.objects.get(id=exe_id).output_data
+    f=StringIO(file_content)
+    s=getsize(f)
+    wrapper=FileWrapper(f)
+    #response=HttpResponse(wrapper, content_type="text/plain")
+    response=HttpResponse(wrapper, content_type="text/html")
+    response["Content-Disposition"]="attachement; filename=output.txt"
+    response["Content-Length"]=s
+    return response
