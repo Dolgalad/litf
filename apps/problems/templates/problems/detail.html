@@ -2,6 +2,7 @@
 
 {% block main_block %}
   <h1>Problem ({{ problem.id }}) : {{ problem.name }}</h1>
+  <a href="{% url 'problem_edit' problem.id %}">Edit</a><br/>
   {% include 'problems/description_block.html' %}
   <hr/>
 

@@ -20,10 +20,10 @@ NAME_NOT_IN_CONTEXT="name_not_in_context"
 DECLARATION_ERROR="declaration_error"
 INSTANTIATION_ERROR="instantiation_error"
 EXECUTION_ERROR="execution_error"
-OUTPUT_NOT_PKLSERIALIZABLE="output_not_pkl_serializable"
+OUTPUT_NOT_PKL_SERIALIZABLE="output_not_pkl_serializable"
 INPUT_LOAD_ERROR="input_load_error"
 CONSTRUCTOR_INPUT_LOAD_ERROR="constructor_input_load_error"
-CLASS_INSTANTIATION_TEST="class_instantiation_test"
+CLASS_INSTANTIATION_ERROR="class_instantiation_error"
 UNKWN_CODE_TYPE="unkwnown_code_type"
 
 # code types
@@ -50,7 +50,7 @@ def exit_code(err):
         return 7
     elif err==CONSTRUCTOR_INPUT_LOAD_ERROR:
         return 8
-    elif err==CLASS_INSTANTIATION_TEST:
+    elif err==CLASS_INSTANTIATION_ERROR:
         return 9
     elif err==UNKWN_CODE_TYPE:
         return 10
@@ -145,7 +145,7 @@ def context_add_vars(vars_dict, context):
         context[t]=vars_dict[k]
     return tuple(a)
  
-def class_instantiation_test(constr_f, c_args, c_kwargs, g, l, buf,ct):
+def class_instantiation_test(constr_f, c_args, c_kwargs, g, l, stdout_buffer,ct):
     # instantiation test
     instance=None
     try:

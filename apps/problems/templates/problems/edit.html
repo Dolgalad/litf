@@ -8,4 +8,13 @@
 <input type="reset" name="reset" value="Reset"/>
 <a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
 </form>
+<script>
+                var req_editor = CodeMirror.fromTextArea(document.getElementById("{{form.description.auto_id}}"),{
+			mode: null,
+			lineNumbers: true,
+		});
+                req_editor.setSize(null,200);
+
+	</script>
+
 {% endblock main_block %}

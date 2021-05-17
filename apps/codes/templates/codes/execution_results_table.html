@@ -1,0 +1,20 @@
+<table>
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>start</th>
+			<th>stop</th>
+			<th>status</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for exe in execution_results %}
+		<tr>
+			<td>{{exe.id}}</td>
+			<td>{{exe.start_time}}</td>
+			<td>{{exe.stop_time}}</td>
+			<td>{{exe.status}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

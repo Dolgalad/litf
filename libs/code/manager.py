@@ -57,6 +57,10 @@ class CodeManager:
             rs=venv.install_requirements(requirements)
         # save code in virtual environement
         sc=venv.save_code(code)
+        # move files
+        files=cm.get_filenames()
+        print("FILES : {}".format(files))
+        venv.move_files(files)
         # run the testing script
         ts=venv.exec_file(os.path.join(venv_dir,"test_script.py"), "{} code".format(class_name))
         # read the test_output.json file before deleting the virtual environement

@@ -1,0 +1,16 @@
+<div class="requirements_table" style="border: 1px; border-style: solid; border-color: black">
+	<table>
+		<thead>
+			<tr>
+				<th>module</th>
+			</tr>
+		</thead>
+		<tbody>
+	{% for requirement in requirements %}
+	  <tr>
+		  <td>{{requirement}}</td>
+	  </tr>
+	  {% endfor %}
+	  </tbody>
+	  </table>
+</div>

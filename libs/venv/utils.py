@@ -63,3 +63,9 @@ class VirtualEnv:
         with open(c_path, "w") as f:
             f.write(code)
             f.close()
+    def move_files(self, files):
+        for f in files:
+            # get the basename
+            base_name=os.path.basename(f)
+            target_name=os.path.join(self.path,base_name)
+            os.system("cp {} {}".format(f,target_name))

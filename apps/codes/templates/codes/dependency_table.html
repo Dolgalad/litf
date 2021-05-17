@@ -1,0 +1,25 @@
+<table>
+	<thead>
+		<tr>
+			<th>
+				<th>#</th>
+				<th>name</th>
+				<!--<th>status</th>-->
+				<th>created</th>
+				<th>by</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for dep in dependencies %}
+                  <tr>
+			  <td>{{dep.id}}</td>
+			  <td><a href="{% url 'code_detail' dep.id %}">{{dep.name}}</a></td>
+			  <!--<td>{{dep.status}}</td>-->
+			  <td>{{dep.date}}</td>
+			  <td>{{dep.author}}</td>
+		  </tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+				

@@ -39,6 +39,8 @@ class CodeModel(models.Model):
         :rtype: int
         """
         return len(self.dependencies.all())
+    def file_count(self):
+        return len(self.files.all())
     def get_requirements(self):
         """Get the requirements for this object, checks all dependencies for dependencies and returns the full list
         :return: requirements list
@@ -70,6 +72,18 @@ class CodeModel(models.Model):
             print(errors.CODEMODEL_CODE_EMPTY)
             return a
         return a+self.code
+    def get_filenames(self):
+        a=[]
+        if self.dependency_count():
+            for dep in self.dependencies.all():
+                for f in dep.get_filenames():
+                    if not f in a:
+                        a.append(f)
+        if self.file_count():
+            for f in self.files.all():
+                if not f.datafile.path in a:
+                    a.append(f.datafile.path)
+        return a
     def code_empty(self):
         return len(self.code)==0
     def __str__(self):
@@ -77,7 +91,7 @@ class CodeModel(models.Model):
     def data(self):
         return {"name":self.name, "code":self.code, "requirements":self.requirements, \
                 "dependencies":[dep.data() for dep in self.dependencies.all()], \
-                "files":[f.path for f in self.files.all()], "author":self.author.id, \
+                "files":[f.datafile.path for f in self.files.all()], "author":self.author.id, \
                 "date":self.date}
 class ExecutionResultModel(models.Model):
     implementation=models.ForeignKey(CodeModel, on_delete=models.CASCADE)

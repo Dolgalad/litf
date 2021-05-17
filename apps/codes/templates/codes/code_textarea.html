@@ -1,0 +1,27 @@
+<div class="code_textarea_div" style="border: 1px; boder-style: solid; border-color: black;">
+	<textarea rows="14" id="code_textarea" name="code_textarea">{{code}}</textarea>
+	<script>
+		var editor = CodeMirror.fromTextArea(document.getElementById("code_textarea"), {
+			mode: {name: "python",
+				version: 3,
+				singleLineStringErrors: false},
+			lineNumbers: true,
+			indentUnit: 2,
+			matchBrackets: true,
+			readOnly: true,
+		});
+                editor.setSize(null, 200);
+	</script>
+        <!--
+	<script type="text/javascript">
+		window.onload = function() {
+			var element = document.getElementById("code_textarea");
+			element.classList.add('cm-s-default');
+			var code = element.innerText;
+			console.log(code);
+			element.innerHTML="";
+			CodeMirror.runMode(code, "python", element);
+		};
+	</script>
+	-->
+</div>

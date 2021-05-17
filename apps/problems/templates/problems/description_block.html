@@ -20,5 +20,15 @@ There are {{ problem.solvers|length }} solvers submitted for this problem.
 </div>
 
 <h3>Input/output description</h3>
-Add input/output description here.
+{% if problem.input_type %}
+Input type : <a href="{% url 'code_detail' problem.input_type.id %}">{{problem.input_type.name}}</a><br/>
+{% else %}
+Input type : float
+{% endif %}
+
+{% if problem.output_type %}
+Output type : <a href="{% url 'code_detail' problem.input_type.id %}">{{problem.output_type.name}}</a><br/>
+{% else %}
+Output type : float
+{% endif %}
 
