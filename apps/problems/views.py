@@ -216,4 +216,5 @@ class PostprocessEditView(UpdateView):
         problem_updated_task.delay(self.object.data())
         return super().form_valid(form)
 
-   
+class AboutView(TemplateView):
+    template_name="about.html"

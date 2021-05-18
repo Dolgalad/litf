@@ -10,6 +10,7 @@
 				<th></th>
 				<th>#</th>
 				<th>path</th>
+				<th>size</th>
 				<th>flags</th>
 				<th>uploaded</th>
 				<th>by</th>
@@ -21,6 +22,7 @@
 				<td><input type="checkbox" name="datafile_id_{{file.id}}"></td>
 				<td>{{file.id}}</td>
 				<td><a href="{% url 'datafile_detail' file.id %}">{{file.datafile.name}}</a></td>
+				<td>{{file.datafile.size}}</td>
 				<td>{{file.flags}}</td>
 				<td>{{file.date}}</td>
 				<td>{{file.author}}</td>
