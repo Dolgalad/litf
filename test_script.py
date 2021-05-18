@@ -182,6 +182,10 @@ def load_code():
         c=f.read()
         f.close()
     return c
+def load_info_file():
+    if not os.path.exists("info_file.json"):
+        return {}
+    return json.load(open("info_file.json","r"))
 if __name__=="__main__":
     # two command line arguments
     name=sys.argv[1]
@@ -191,6 +195,9 @@ if __name__=="__main__":
     if not os.path.exists("code.py"):
         exit(exit_code(MISSING_CODE_FILE))
     code=load_code()
+
+    # check for existing info_file.json
+    info_data=load_info_file()
 
     # create an empty context
     context_g, context_l={},{}
@@ -219,6 +226,7 @@ if __name__=="__main__":
 
     if req_type=="code":
         with io.StringIO() as buf, redirect_stdout(buf):
+            print("INFO : {}".format(info_data))
             glo,loc=[k for k in globals()], [k for k in locals()]
             # declaration code execution
             declaration_test(code, context_g, context_l, buf)
@@ -249,6 +257,27 @@ if __name__=="__main__":
                 # method.
                 if hasattr(instance,"__call__"):
                     output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, context_g,context_l, buf,code_type)
+                    # convert the output to output_type object
+                    if "output_type" in info_data:
+                        try:
+                            context_g["output"]=output
+                            oto=eval("{}(output)".format(info_data["output_type"]),context_g)
+                            #print(oto)
+                            # check is output type has a dump method
+                            print("has fump : {}".format(hasattr(oto,"dump")))
+                            print([k for k in eval("oto.__dict__")])
+                            print(eval("hasattr(oto, \"dump\")"))
+                            print(getattr(oto, "dump", None))
+                            print(eval("getattr(oto, \"dump\", None)"))
+                            exec("oto.dump(\"output_data.dat\")")
+                            if hasattr(oto,"dump"):
+                                print("HAS dump")
+                                context_g["oto"]=oto
+                                exec("oto.dump(\"output_data.dat\")", context_g)
+                        except Exception as e:
+                            print("Error converting output to output_type {} \n{}".format(info_data["output_type"], e))
+                else:
+                    print("class {} has not __call__ method".format(name))
                 
             else:
                 print("Unknown type code")
@@ -260,7 +289,8 @@ if __name__=="__main__":
                          "globals":[k for k in context_g],\
                          "locals":[k for k in context_l],\
                          "stdout":buf.getvalue(),\
-                         "type":code_type}
+                         "type":code_type,
+                         "error":None}
             if not output is None:
                 test_output["output"]=output
                 test_output["output_type"]=str(type(output))

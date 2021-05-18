@@ -81,7 +81,9 @@ class CodeManager:
         print("Solver status : {}".format(solver.implementation.status))
         #if not solver.implementation.status==0:
         #    return
-
+        
+        # initialize info_data
+        info_data={}
         # get input data resources
         input_data=[]
         for in_data in solver.problem.input_data.all():
@@ -89,9 +91,16 @@ class CodeManager:
         
         # check for input and output types
         input_type_res=CodeManager.get_codemodel_resources(solver.problem.input_type)
+        if solver.problem.input_type:
+            info_data["input_type"]=solver.problem.input_type.name
+
         output_type_res=CodeManager.get_codemodel_resources(solver.problem.output_type)
+        if solver.problem.output_type:
+            info_data["output_type"]=solver.problem.output_type.name
         # check for postprocessing types
         process_res=CodeManager.get_codemodel_resources([p for p in solver.problem.postprocess.all()])
+        # add the preprocess steps to the info file
+        info_data["postprocess"]=[p.name for p in solver.problem.postprocess.all()]
         # get solver implementation resources
         solver_res=CodeManager.get_codemodel_resources(solver.implementation)
         # merge the resources
@@ -105,16 +114,23 @@ class CodeManager:
 
         # add input data
         venv.move_input_data(input_data)
+        # add info file
+        venv.save_info_file(info_data)
 
         # execute the test script and get output
         print("before solver execution : ")
         os.system("ls {}".format(venv.path))
         output=CodeManager.run_test_and_get_output(venv, "{} code".format(solver.implementation.name))
         print("SOLVER RUN OUTPUT")
+        print("OUTPUT STATUS : {}".format(output["error_code"]))
+        print("OUTPUT STDOUT : \n{}".format(output["stdout"]))
+        print("OUTPUT ERRORS : {}".format(output["error"]))
 
         # save the problem solution
         # save the output
-        erm=CodeManager.save_output_erm(solver.implementation.id, output, flags="solution")
+        erm=CodeManager.save_output_erm(solver.implementation, output, flags="solution")
+
+
 
         # remove venv
         venv.delete_env()
@@ -124,11 +140,20 @@ class CodeManager:
     @staticmethod
     def load_output(venv_dir):
         p=os.path.join(venv_dir,"test_output.json")
+        odata=os.path.join(venv_dir, "output_data.dat")
+        output_data=None
+        if os.path.exists(odata):
+            print("output_data.dat exists !!!!!!!!!!!!!!!!!!!!!!")
+            # get the contents as binary
+            output_data=open(odata,"rb").read()
+            print("TPAZEHG : {}".format(type(output_data)))
         if not os.path.exists(p):
             return {"error_code":-2,"error":"Test output file not found"}
-        return pkl.load(open(p,"rb"))
+        d=pkl.load(open(p,"rb"))
+        d["output_content"]=output_data
+        return d
     @staticmethod
-    def save_output_erm(code_id, output, input_data=None, flags=None):
+    def save_output_erm(cm, output, input_data=None, flags=None):
         stdout,err=None,None
         ti,tf=None,None
         y=None
@@ -143,9 +168,9 @@ class CodeManager:
         if "stdout" in output:
             stdout=output["stdout"]
         # save the model
-        erm=ExecutionResultModel.objects.create(implementation=CodeModel.objects.get(id=code_id),\
+        erm=ExecutionResultModel.objects.create(implementation=cm,\
                                                 input_data=input_data,\
-                                                output_data=y,\
+                                                output_data=output["output_content"],\
                                                 status=output["error_code"],\
                                                 start_time=ti,\
                                                 stop_time=tf,\
@@ -183,12 +208,13 @@ class CodeManager:
         print(output)
 
         # save the output
-        erm=CodeManager.save_output_erm(code_id, output, flags="integrity")
+        erm=CodeManager.save_output_erm(cm, output, flags="integrity")
 
 
         # set the codemodels status
         cm.status=erm.status
         cm.save()
+        #erm.save()
 
         # remove venv
         venv.delete_env()

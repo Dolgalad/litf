@@ -97,7 +97,7 @@ class CodeModel(models.Model):
 class ExecutionResultModel(models.Model):
     implementation=models.ForeignKey(CodeModel, on_delete=models.CASCADE)
     input_data=models.ForeignKey(DataFileModel, on_delete=models.CASCADE, blank=True, null=True)
-    output_data=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
+    output_data=models.BinaryField(blank=True, null=True)
     status=models.IntegerField(default=-1)
     start_time=models.DateTimeField(blank=True,null=True)
     stop_time=models.DateTimeField(blank=True,null=True)

@@ -175,11 +175,17 @@ def getsize(f):
     return s
 def output_download_view(request,exe_id):
     file_content=ExecutionResultModel.objects.get(id=exe_id).output_data
-    f=StringIO(file_content)
+    print(type(file_content))
+    print(file_content)
+    # file content in bytes
+    if isinstance(file_content, bytes):
+        f=StringIO(file_content.decode("utf-8"))
+    else:
+        f=StringIO(file_content)
     s=getsize(f)
     wrapper=FileWrapper(f)
     #response=HttpResponse(wrapper, content_type="text/plain")
-    response=HttpResponse(wrapper, content_type="text/html")
-    response["Content-Disposition"]="attachement; filename=output.txt"
+    response=HttpResponse(wrapper, content_type="text/plain")
+    response["Content-Disposition"]="attachement; filename=output"
     response["Content-Length"]=s
     return response

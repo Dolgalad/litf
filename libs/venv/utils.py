@@ -4,6 +4,7 @@
 :brief: utilities for managing virual environements
 """
 import os
+import json
 import subprocess
 import venv
 
@@ -72,6 +73,9 @@ class VirtualEnv:
         with open(c_path, "w") as f:
             f.write(code)
             f.close()
+    def save_info_file(self, data):
+        if len(data):
+            json.dump(data, open(os.path.join(self.path,"info_file.json"),"w"))
     def move_files(self, files):
         for f in files:
             # get the basename
