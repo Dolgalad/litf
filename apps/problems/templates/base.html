@@ -1,4 +1,4 @@
-<doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -14,8 +14,25 @@
     <script src="{% static 'solvers/codemirror/codemirror-5.61.0/mode/python/python.js' %}"></script>
     <script src="{% static 'solvers/codemirror/codemirror-5.61.0/mode/markdown/markdown.js' %}"></script>
 
+    <script src="/admin/jsi18n/"></script>
+    <script src="/static/admin/js/vendor/jquery/jquery.js"></script>
+    <!--<script src="/static/admin/js/calendar.js"></script>-->
+    <script src="/static/admin/js/jquery.init.js"></script>
+    <!--<script src="/static/admin/js/admin/DateTimeShortcuts.js"></script>-->
+    <script src="/static/admin/js/core.js"></script>
+    <script src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+    <script src="/static/admin/js/actions.js"></script>
+    <script src="/static/admin/js/urlify.js"></script>
+    <script src="/static/admin/js/prepopulate.js"></script>
+    <script src="/static/admin/js/vendor/xregexp/xregexp.js"></script>
+
   </head>
+  {% if popup %}
+  <body class="popup app-codes model-codemodel change-form">
+  {% else %}
   <body>
+  {% endif %}
+
     <header class="header">
       <div class="header">
 	      <a href="/" class="logo"><img src={% static 'solvers/substorm_img.jpeg' %} alt="Substorms" width="200"></a>

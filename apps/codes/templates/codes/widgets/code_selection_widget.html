@@ -1,0 +1,19 @@
+<div class="related-widget-wrapper">
+<select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
+  <optgroup label="{{ group_name }}">{% endif %}{% for option in group_choices %}
+  {% include option.template_name with widget=option %}{% endfor %}{% if group_name %}
+  </optgroup>{% endif %}{% endfor %}
+</select>
+<!--<a href="{% url 'code_edit' 1 %}" data-href-template="/admin/auth/__fk__/change/?_to_field=id&_popup=1">Edit{{ widget.attrs}}</a><a href="{% url 'code_add' %}">Add</a>-->
+
+<a class="related-widget-wrapper-link change-related" id="change_id_input_type" data-href-template="/code/edit/__fk__/?_to_field=id&amp;_popup=1" title="Change selected input type" href=""><img src="/static/admin/img/icon-changelink.svg" alt="Change"></a>
+
+<a class="related-widget-wrapper-link add-related" id="add_id_code" href="/code/add/?_to_field=id&amp;_popup=1" title="Add another code"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a>
+
+</div>
+
+<script id="django-admin-form-add-constants" src="/static/admin/js/change_form.js" async>
+    </script>
+
+<script id="django-admin-prepopulated-fields-constants" src="/static/admin/js/prepopulate_init.js" data-prepopulated-fields="[]">
+</script>

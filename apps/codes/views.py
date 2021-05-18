@@ -93,6 +93,11 @@ class EditView(UpdateView):
             context["cancel_url"]=self.request.META["HTTP_REFERER"]
         else:
             context["cancel_url"]=reverse("profile")
+        if "_popup" in self.request.GET:
+            context["popup"]=True
+        else:
+            context["popup"]=False
+        print("EditView.get_context_data : {}".format(context))
         return context
     def form_valid(self, form):
         self.object=form.save()
@@ -107,6 +112,12 @@ class EditView(UpdateView):
         context["author"]=self.request.user
         print("in EditView.get_initial : {}".format(context))
         return context
+    def get(self, *args, **kwargs):
+        print("in EditView.get")
+        print(args)
+        print(kwargs)
+        print(args[0].GET)
+        return super().get(*args,**kwargs)
         
 
 
@@ -151,6 +162,12 @@ class DataEditView(UpdateView):
             context["cancel_url"]=self.request.META["HTTP_REFERER"]
         else:
             context["cancel_url"]=reverse("profile")
+
+        # DEBUG - remove this pls
+        from django.forms import modelformset_factory
+        mfsf=modelformset_factory(CodeModel, fields="__all__", extra=1)
+        context["formset"]=mfsf(queryset=CodeModel.objects.filter(id=10))
+        #context["formset"]=mfsf()
         return context
     def form_valid(self, form):
         self.object=form.save(commit=False)

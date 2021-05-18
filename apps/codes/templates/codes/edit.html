@@ -3,11 +3,18 @@
 {% block main_block %}
 <h2>Code editing</h2>
 <form method="post" role="form">
+
 	{% csrf_token %}
+	<input type="hidden" name="_popup" value="1">
+<input type="hidden" name="_to_field" value="id">
 {{ form.as_p }}
+
+<div class="submit-row">
 <input type="submit" name="submit" value="Save"/>
+<input type="submit" name="_save" value="SAVE" class="default"/>
 <input type="reset" name="reset" value="Reset"/>
 <a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
+</div>
 </form>
 
 	<script>
