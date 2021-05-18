@@ -29,6 +29,7 @@ class CodeModel(models.Model):
     files=models.ManyToManyField(DataFileModel, blank=True, related_name="code_files")
     author=models.ForeignKey(User, on_delete=models.CASCADE)
     date=models.DateTimeField()
+    status=models.IntegerField(default=-1)
     def get_execution_results(self):
         return ExecutionResultModel.objects.filter(implementation=self)
     def get_absolute_url(self):
@@ -102,7 +103,13 @@ class ExecutionResultModel(models.Model):
     stop_time=models.DateTimeField(blank=True,null=True)
     stdout=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
     errors=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
+    flags=models.CharField(max_length=settings.MAX_TEXT_LENGTH, blank=True, null=True)
     def data(self):
-        return {"implementation":self.implementation.id, "input_data":self.input_data.id,\
-                "output_data":self.output_data, "status":self.status, "start_time":start_time,\
-                "stop_time":self.stop_time, "stdout":self.stdout, "errors":self.errors}
+        a= {"implementation":self.implementation.id, "input_data":None,\
+                "output_data":None, "status":self.status, "start_time":self.start_time,\
+                "stop_time":self.stop_time, "stdout":self.stdout, "errors":self.errors, "flags":self.flags}
+        if self.input_data:
+            a["input_data"]=self.input_data.id
+        if self.output_data:
+            a["output_data"]=self.output_data
+        return a

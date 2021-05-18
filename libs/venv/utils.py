@@ -23,12 +23,21 @@ class VEnvOutput:
 class VirtualEnv:
     """Class for managing a python virtual environement
     """
-    def __init__(self, venv_dir):
+    def __init__(self, venv_dir, resources=None):
         self.path=venv_dir
         self.create_env()
         self.copy_test_script()
+        if not resources is None:
+            # save code
+            self.save_code(resources[0])
+            # move the files
+            self.move_files(resources[2])
+            # install requirements
+            self.install_requirements(resources[1])
     def copy_test_script(self):
         os.system("cp {} {}".format(TEST_SCRIPT_PATH, os.path.join(self.path, "test_script.py")))
+    def run_test_script(self, params=""):
+        return self.exec_file(os.path.join(self.path,"test_script.py"),params)
     def create_env(self):
         return venv.EnvBuilder(clear=True, with_pip=True).create(env_dir=self.path)
     def delete_env(self):

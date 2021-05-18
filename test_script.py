@@ -239,6 +239,7 @@ if __name__=="__main__":
                 c_args,c_kwargs=load_constr_args(context_g,context_l,buf,code_type)
                 # load input args
                 i_args,i_kwargs=load_input_args(context_g,context_l,buf,code_type)
+                #print("Input args : {}, {}".format(i_args,i_kwargs))
                 # constructor instantiation test
                 constructor_f=function_instantiation_test(name,context_g,context_l, buf,code_type)
                 # class instantiation test
