@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 apps/codes/migrations
+apps/solvers/migrations
 data
 db.sqlite3
 postprocessing
