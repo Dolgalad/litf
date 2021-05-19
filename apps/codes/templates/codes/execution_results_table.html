@@ -12,8 +12,8 @@
 		{% for exe in execution_results %}
 		<tr>
 			<td>{{exe.id}}</td>
-			<td>{{exe.start_time}}</td>
-			<td>{{exe.stop_time}}</td>
+			<td>{{exe.start_time|date:'Y/m/d H:i:s'}}</td>
+			<td>{{exe.stop_time|date:'Y/m/d H:i:s'}}</td>
 			<td>{{exe.status}}</td>
 			<td><a href="{% url 'output_download' exe.id %}">(output)</a></td>
 		</tr>

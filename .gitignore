@@ -1,3 +1,8 @@
 *.pyc
 *.swp
+apps/codes/migrations
+data
+db.sqlite3
+postprocessing
+virtual_environements
 

@@ -19,7 +19,7 @@ from libs.code.syntax import *
 # import CodeModel
 from apps.codes.models import CodeModel,ExecutionResultModel
 # import SolverModel
-from apps.solvers.models import SolverModel
+from apps.solvers.models import SolverModel, PostprocessingResultModel
 # Some settings
 VENV_CREATION_PATH="virtual_environements"
 OUTPUT_FILENAME="test_output.json"
@@ -77,6 +77,14 @@ class CodeManager:
     @staticmethod
     def solver_run(solver_id):
         solver=SolverModel.objects.get(id=solver_id)
+        # delete all previous solver runs if the implementation was changed
+        print("Deleting previous solutions obtained with the solver")
+        to_del=ExecutionResultModel.objects.filter(implementation=solver.implementation)
+        to_del=to_del.filter(flags="solution")
+        print("deleting {} objects ".format(len(to_del)))
+        if len(to_del):
+            to_del.delete()
+        
         # if solver status is not SUCCESS (0) then return 
         print("Solver status : {}".format(solver.implementation.status))
         #if not solver.implementation.status==0:
@@ -129,17 +137,51 @@ class CodeManager:
         # if the output is a string and a file exists with the same name in the virtual environement
         # save it
 
+                # save the problem solution
+        # save the output
+        erm=CodeManager.save_output_erm(solver.implementation, output, flags="solution")
+        erm.save()
+
+        # postprocessing
+        print("has postprocessing : {}".format("postprocessing" in output))
         if "postprocessing" in output:
-            for process in output["postprocessing"]:
-                if isinstance(process, str):
-                    pp=os.path.join(venv.path, process)
+            for [process_name, process_out] in output["postprocessing"]:
+                print("PROCESS : {}".format(process_name))
+                print(type(process_out))
+                print("OUT : {} {}".format(process_out, type(process_out)))
+                process_obj=None
+                for ppp in solver.problem.postprocess.all():
+                    if ppp.name == process_name:
+                        process_obj=ppp
+                if process_obj is None:
+                    continue
+                if isinstance(process_out, str):
+                    pp=os.path.join(venv.path, process_out)
+                    os.system("ls {}".format(venv.path))
+                    print("pp : {} {}".format(pp, os.path.exists(pp)))
                     if os.path.exists(pp):
                         # save the output file somewhere
                         print("Save PostprocessResultModel")
-                        pass
-        # save the problem solution
-        # save the output
-        erm=CodeManager.save_output_erm(solver.implementation, output, flags="solution")
+                        from django.core.files import File
+                        f=File(open(pp,"rb"))
+                        #f.save("new_name")
+                        postpr=PostprocessingResultModel.objects.create(problem=solver.problem, \
+                                                                 implementation=process_obj,\
+                                                                 output_file=f,\
+                                                                 solver=solver,\
+                                                                 execution_result=erm)
+                        print("FILENAME : {}".format(postpr.output_file))
+                        #bn=os.path.basename(postpr.output_file.path)
+                        #postpr.output_file.save(bn)
+                        #print("NEW FILENAME : {}".format(postpr.output_file))
+                        postpr.save()
+                else:
+                    postpr=PostprocessingResultModel.objects.create(problem=solver.problem,\
+                                                                 implementation=process_obj,\
+                                                                 solver=solver,\
+                                                                 output_data=process_out,\
+                                                                 execution_result=erm)
+                    postpr.save()
 
 
 

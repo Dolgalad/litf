@@ -10,5 +10,28 @@
     {% include 'codes/execution_results_table.html' with execution_results=solutions %}
   {% endif %}
 
+  {% if postprocessing %}
+  <h2>Post-processing</h2>
+    <table>
+	    <thead>
+		    <tr>
+			    <th>#</th>
+			    <th>process</th>
+			    <th>output</th>
+	            </tr>
+	    </thead>
+	    <tbody>
+    {% for p in postprocessing %}
+      <tr>
+	      <td>{{p.id}}</td>
+	      <td>{{p.implementation.name}}</td>
+	      <td>{% autoescape off %}{{ p.html_render }}{% endautoescape %}</td>
+      </tr>
+    {% endfor %}
+	    </tbody>
+    </table>
+  {% endif %}
+
+
     
 {% endblock main_block %}

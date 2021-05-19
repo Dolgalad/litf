@@ -5,7 +5,7 @@ from django.urls import reverse
 # import settings
 from libs import settings
 # import CodeModel
-from apps.codes.models import DataFileModel, CodeModel
+from apps.codes.models import DataFileModel, CodeModel, ExecutionResultModel
 # Create your models here.
 
 class ProblemModel(models.Model):
@@ -28,3 +28,5 @@ class ProblemModel(models.Model):
             input_type_id=self.input_type.id
         return {"name":self.name, "description":self.description, "author":self.author.id,\
                 "date":self.date, "input_type": input_type_id}
+
+

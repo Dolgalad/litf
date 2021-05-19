@@ -5,7 +5,7 @@ from django.utils import timezone
 # my forms
 from .forms import SolverModelForm
 # my models 
-from .models import SolverModel
+from .models import SolverModel, PostprocessingResultModel
 from apps.problems.models import ProblemModel
 from apps.codes.models import ExecutionResultModel
 
@@ -21,6 +21,9 @@ class DetailView(TemplateView):
         context["solver"]=SolverModel.objects.get(id=kwargs["pk"])
         # get list of ExecutionResultModel object obtained with this solvers implementation
         context["solutions"]=ExecutionResultModel.objects.filter(implementation=solver.implementation)
+        context["postprocessing"]=PostprocessingResultModel.objects.filter(problem=solver.problem,\
+                                                                           solver=solver)
+        print("post process ing  : {}", context["postprocessing"])
         return context
 
 class AddView(CreateView):
