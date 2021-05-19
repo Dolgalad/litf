@@ -68,7 +68,7 @@ class CodeManager:
         ts=venv.run_test_script(params)
         # check if output file exists
         if not os.path.exists(os.path.join(venv.path,"test_output.json")):
-            return {"error_code":-2, "error":"output file not found"}
+            return {"error_code":-2, "error":"output file not found","stdout":""}
         return CodeManager.load_output(venv.path)
     @staticmethod
     def get_solver_venv_dir(problem_id, solver_id):
@@ -125,7 +125,18 @@ class CodeManager:
         print("OUTPUT STATUS : {}".format(output["error_code"]))
         print("OUTPUT STDOUT : \n{}".format(output["stdout"]))
         print("OUTPUT ERRORS : {}".format(output["error"]))
+        print("OUTPUT OUTPUT : {}".format(output["output"]))
+        # if the output is a string and a file exists with the same name in the virtual environement
+        # save it
 
+        if "postprocessing" in output:
+            for process in output["postprocessing"]:
+                if isinstance(process, str):
+                    pp=os.path.join(venv.path, process)
+                    if os.path.exists(pp):
+                        # save the output file somewhere
+                        print("Save PostprocessResultModel")
+                        pass
         # save the problem solution
         # save the output
         erm=CodeManager.save_output_erm(solver.implementation, output, flags="solution")
@@ -167,6 +178,8 @@ class CodeManager:
             tf=output["stop_dt"]
         if "stdout" in output:
             stdout=output["stdout"]
+        if not "output_content" in output:
+            output["output_content"]=None
         # save the model
         erm=ExecutionResultModel.objects.create(implementation=cm,\
                                                 input_data=input_data,\

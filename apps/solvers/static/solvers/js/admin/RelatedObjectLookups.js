@@ -133,6 +133,7 @@
         $('body').on('click', '.related-widget-wrapper-link', function(e) {
             e.preventDefault();
             if (this.href) {
+		console.log(this.href);
                 const event = $.Event('django:show-related', {href: this.href});
                 $(this).trigger(event);
                 if (!event.isDefaultPrevented()) {

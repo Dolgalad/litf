@@ -25,6 +25,7 @@ INPUT_LOAD_ERROR="input_load_error"
 CONSTRUCTOR_INPUT_LOAD_ERROR="constructor_input_load_error"
 CLASS_INSTANTIATION_ERROR="class_instantiation_error"
 UNKWN_CODE_TYPE="unkwnown_code_type"
+OUTPUT_CONVERSION_ERROR="output_conversion_error"
 
 # code types
 CLASS_TYPE=0
@@ -54,6 +55,8 @@ def exit_code(err):
         return 9
     elif err==UNKWN_CODE_TYPE:
         return 10
+    elif err==OUTPUT_CONVERSION_ERROR:
+        return 11
     else:
         return -1
 
@@ -176,6 +179,34 @@ def execution_test(f,args,kwargs,g,l,stdout_buffer,ct):
         exit(exit_code(EXECUTION_ERROR))
     return y,ti,tf
 
+def output_conversion_test(output_type_name, out, g, l, b, c):
+    try:
+        context_g["output"]=output
+        ti=datetime.datetime.now()
+        print("CMD  : {}(output)".format(output_type_name))
+        oto=eval("{}(output)".format(output_type_name),g)
+        tf=datetime.datetime.now()
+        # if has dump method try to write to "output_data.dat"
+        if not hasattr(oto,"dump"):
+            # if object is pickleable then mabey keep it
+            return output,ti,tf
+        
+        # dump to "output_data.dat"
+        context_g["oto"]=oto
+        exec("oto.dump(\"output_data.dat\")", g)
+        print("GOOD")
+    except Exception as e:
+        save_output(err_output(OUTPUT_CONVERSION_ERROR,e, g, l, b.getvalue(), c))
+        exit(exit_code(OUTPUT_CONVERSION_ERROR))
+    return "output_data.dat",ti,tf
+
+def get_test_output(error_code=-1, stdout=None, c_type=2, _globals=None, _locals=None, error=None,\
+        output=None, start_dt=None, stop_dt=None, conv_start_dt=None,conv_stop_dt=None):
+    a,b=list(_globals.keys()),list(_locals.keys())
+    return {"error_code":error_code, "stdout":stdout, "type":c_type, "globals":a,\
+            "locals":b, "error":error,"output":output,"output_type":type(output),\
+            "start_dt":start_dt, "stop_dt":stop_dt, "conversion_start_dt":conv_start_dt,\
+            "conversion_stop_dt":conv_stop_dt}
 def load_code():
     c=None
     with open("code.py","r") as f:
@@ -235,69 +266,80 @@ if __name__=="__main__":
             # if <name> isn't contained in globals then exit with
             # NAME_NOT_IN_CONTEXT error
             code_type=context_test(name, context_g, context_l, buf)
+            if code_type==UNKWN_TYPE:
+                output_info={"error_code":exit_code(UNKWN_CODE_ERROR),"error":"litf does not abide {}'s (yet)".format(code_type),"stdout":buf.getvalue()}
+            # load input args
+            i_args,i_kwargs=load_input_args(context_g,context_l,buf,code_type)
+
             if code_type==FUNC_TYPE:
-                # load input args
-                args,kwargs=load_input_args(context_g,context_l,buf,code_type)
                 # function instantiation test
-                f=function_instantiation_test(name,context_g,context_l,buf,code_type)
-                # execution test
-                output,ti,tf=execution_test(f,args,kwargs,context_g,context_l,buf,code_type)
+                instance=function_instantiation_test(name,context_g,context_l,buf,code_type)
             elif code_type==CLASS_TYPE:
                 # load constructor args
                 c_args,c_kwargs=load_constr_args(context_g,context_l,buf,code_type)
-                # load input args
-                i_args,i_kwargs=load_input_args(context_g,context_l,buf,code_type)
                 #print("Input args : {}, {}".format(i_args,i_kwargs))
                 # constructor instantiation test
                 constructor_f=function_instantiation_test(name,context_g,context_l, buf,code_type)
                 # class instantiation test
                 instance=class_instantiation_test(constructor_f, c_args,c_kwargs, context_g,context_l, buf,code_type)
-                # we could add a execution test but we would need to know which method to test
-                # when testing a solver we would need the instance to be callable or have a solve
-                # method.
-                if hasattr(instance,"__call__"):
-                    output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, context_g,context_l, buf,code_type)
-                    # convert the output to output_type object
-                    if "output_type" in info_data:
-                        try:
-                            context_g["output"]=output
-                            oto=eval("{}(output)".format(info_data["output_type"]),context_g)
-                            #print(oto)
-                            # check is output type has a dump method
-                            print("has fump : {}".format(hasattr(oto,"dump")))
-                            print([k for k in eval("oto.__dict__")])
-                            print(eval("hasattr(oto, \"dump\")"))
-                            print(getattr(oto, "dump", None))
-                            print(eval("getattr(oto, \"dump\", None)"))
-                            exec("oto.dump(\"output_data.dat\")")
-                            if hasattr(oto,"dump"):
-                                print("HAS dump")
-                                context_g["oto"]=oto
-                                exec("oto.dump(\"output_data.dat\")", context_g)
-                        except Exception as e:
-                            print("Error converting output to output_type {} \n{}".format(info_data["output_type"], e))
-                else:
-                    print("class {} has not __call__ method".format(name))
-                
-            else:
-                print("Unknown type code")
-                save_output(err_output(UNKWN_CODE_TYPE,context_g,context_l))
-                exit(exit_code(UNKWN_CODE_TYPE))
+            # if no input data return SUCCESS
+            if not os.path.exists(INPUT_FILENAME):
+                # try calling with no arguments
+                output,ti,tf=execution_test(instance,(),{},context_g,context_l,buf,code_type)
+                test_output=get_test_output(error_code=0, stdout=buf.getvalue(),c_type=code_type,\
+                                       _globals=context_l, _locals=context_l,error=None,\
+                                       start_dt=ti, stop_dt=tf,output=output)
+                save_output(test_output)
+                exit(exit_code(SUCCESS))
 
-            # execution was a success, save and exit
-            test_output={"error_code":exit_code(SUCCESS),\
-                         "globals":[k for k in context_g],\
-                         "locals":[k for k in context_l],\
-                         "stdout":buf.getvalue(),\
-                         "type":code_type,
-                         "error":None}
+            # if there are input data but the object is not callable
+            print("has __call__ {}".format(hasattr(instance,"__call__")))
+            if not hasattr(instance, "__call__"):
+                test_output=get_test_output(error_code=INSTANCE_NOT_CALLABLE_ERROR, error="code instance is not callable, perhaps you forgot to implement a __call__ method")
+                save_output(test_output)
+                exit(exit_code(INSTANCE_NOT_CALLABLE_ERROR))
+
+            # execute instance ( input_args)
+            output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, context_g, context_l,buf, code_type)
+
+            # if an output type was given
+            if "output_type" in info_data:
+                output,ti_conv,tf_conv = output_conversion_test(info_data["output_type"], output, context_g, context_l, buf, code_type)
+            # if there were no errors until this point we can move on to postprocessing
+            print(list(info_data.keys()))
+            postprocessing_info=[]
+            if "postprocess" in info_data:
+                for process_name in info_data["postprocess"]:
+                    print("Postprocessing : {}".format(process_name))
+                    try:
+                        ev=eval("{}(output)".format(process_name),context_g)
+                        print(ev)
+                        postprocessing_info.append([process_name, ev])
+                    except Exception as e:
+                        print("postprocessing error - {} : \n{}".format(process_name, e))
+
+            test_output=get_test_output(error_code=0,\
+                                        _globals=context_g,\
+                                        _locals=context_l,\
+                                        stdout=buf.getvalue(),\
+                                        c_type=code_type,\
+                                        error=None,
+                                        start_dt=ti,\
+                                        stop_dt=tf)
+            print("TEST OUTPUT : {}".format(test_output))
             if not output is None:
                 test_output["output"]=output
                 test_output["output_type"]=str(type(output))
             if (not ti is None) and (not tf is None):
                 test_output["start_dt"]=ti
                 test_output["stop_dt"]=tf
+            if (not ti_conv is None) and (not tf_conv is None):
+                test_output["conversion_start_dt"]=ti_conv
+                test_output["conversion_stop_dt"]=tf_conv
+            if len(postprocessing_info):
+                test_output["postprocessing"]=postprocessing_info
             save_output(test_output)
+
     # exit with success code
     exit(exit_code(SUCCESS))
 
