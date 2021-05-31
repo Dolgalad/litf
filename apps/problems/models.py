@@ -28,5 +28,13 @@ class ProblemModel(models.Model):
             input_type_id=self.input_type.id
         return {"name":self.name, "description":self.description, "author":self.author.id,\
                 "date":self.date, "input_type": input_type_id}
+    def info(self):
+        i={}
+        if self.input_type:
+            i["input_type"]=self.input_type.name
+        if self.output_type:
+            i["output_type"]=self.output_type.name
+        i["postprocess"]=[p.name for p in self.postprocess.all()]
+        return i
 
 

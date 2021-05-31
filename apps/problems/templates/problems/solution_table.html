@@ -1,0 +1,41 @@
+<table>
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>solver</th>
+			<th>start</th>
+			<th>stop</th>
+			<th>status</th>
+			<th>output</th>
+			{% if postprocesses %}
+                          {% for ppname in postprocesses %}
+			    <th>{{ ppname.name }}</th>
+			  {% endfor %}
+			{% endif %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for sol,pp in solutions%}
+		<tr>
+			<td>{{sol.id}}</td>
+			<td>{{sol.solver.name}}</td>
+			<td>{{sol.result.start_time|date:'Y/m/d H:i:s'}}</td>
+			<td>{{sol.result.stop_time|date:'Y/m/d H:i:s'}}</td>
+			<td>{{sol.status}}</td>
+			<td><a href="{% url 'output_download' sol.result.id %}">(output)</a>
+			<a href="{% url 'stderr_download' sol.result.id %}">(stderr)</a>
+			<a href="{% url 'stdout_download' sol.result.id %}">(stdout)</a></td>
+			{% if pp %}
+			  {% for p in pp %}
+			  <td>{% autoescape off %}{{p.html_render}}{% endautoescape %}</td>
+			  {% endfor %}
+			{% else %}
+			   {% for ppname in postprocessing_names %}
+			     <td>-</td>
+			   {% endfor %}
+			{% endif %}
+			
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

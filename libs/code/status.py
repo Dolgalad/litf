@@ -14,3 +14,8 @@ class CodeStatus:
     INPUT_INVALID=5
     OUTPUT_INVALID=6
 
+class ExecutionStatus:
+    SUCCESS=0
+    PENDING=1
+    FAIL=2
+    RUNNING=3

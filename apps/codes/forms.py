@@ -13,6 +13,7 @@ class CodeModelForm(ModelForm):
         widgets={"code":Textarea, "requirements":Textarea}
         exclude=["author","date"]
     def clean(self):
+        #author=self.request.user
         author=self.initial["author"]
         # if name CodeModel with same name has been created by this user then raise ValidationError
         cms=[cm.name for cm in CodeModel.objects.filter(author=author)]

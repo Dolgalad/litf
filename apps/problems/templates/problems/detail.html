@@ -16,5 +16,9 @@
   {% include 'problems/postprocess_block.html' %}
   <hr/>
 
+  {% if solutions %}
+    {% include 'problems/solution_table.html' %}
+  {% endif %}
+
 
 {% endblock main_block %}

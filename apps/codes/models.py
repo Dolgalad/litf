@@ -6,7 +6,12 @@ from django.urls import reverse
 from libs import settings
 # import some errors
 from libs import errors
+# import code execution status
+from libs.code import status
 # Create your models here.
+
+class CodeArgumentModel(models.Model):
+    data=models.CharField(max_length=settings.MAX_TEXT_LENGTH)
 
 class DataFileModel(models.Model):
     datafile=models.FileField(upload_to="data")
@@ -30,6 +35,16 @@ class CodeModel(models.Model):
     author=models.ForeignKey(User, on_delete=models.CASCADE)
     date=models.DateTimeField()
     status=models.IntegerField(default=-1)
+    arguments=models.ForeignKey(CodeArgumentModel, blank=True, null=True, on_delete=models.CASCADE)
+    def get_dependants(self):
+        a=[]
+        for c in CodeModel.objects.all():
+            if c.depends(self):
+                if not c in a:
+                    a.append(c)
+        return a
+    def depends(self, d):
+        return d in self.dependencies.all()
     def get_execution_results(self):
         return ExecutionResultModel.objects.filter(implementation=self)
     def get_absolute_url(self):
@@ -94,10 +109,24 @@ class CodeModel(models.Model):
                 "dependencies":[dep.data() for dep in self.dependencies.all()], \
                 "files":[f.datafile.path for f in self.files.all()], "author":self.author.id, \
                 "date":self.date}
+    def get_execution_results(self):
+        return ExecutionResultModel.objects.filter(implementation=self)
+    def get_pending_execution_result(self):
+        for exec_res in self.get_execution_results():
+            if exec_res.status==status.ExecutionStatus.PENDING:
+                return exec_res
+    def has_pending_execution_result(self):
+        a=self.get_pending_execution_result()
+        return not a is None
+    def create_pending_execution_result(self):
+        ep=ExecutionResultModel.objects.create(implementation=self,status=status.ExecutionStatus.PENDING)
+        ep.save()
+
 class ExecutionResultModel(models.Model):
     implementation=models.ForeignKey(CodeModel, on_delete=models.CASCADE)
     input_data=models.ForeignKey(DataFileModel, on_delete=models.CASCADE, blank=True, null=True)
     output_data=models.BinaryField(blank=True, null=True)
+    output_type=models.CharField(max_length=settings.MAX_NAME_LENGTH, blank=True, null=True)
     status=models.IntegerField(default=-1)
     start_time=models.DateTimeField(blank=True,null=True)
     stop_time=models.DateTimeField(blank=True,null=True)
@@ -113,3 +142,13 @@ class ExecutionResultModel(models.Model):
         if self.output_data:
             a["output_data"]=self.output_data
         return a
+    def __str__(self):
+        return "ExecutionResultModel : status : {}".format(self.status)
+    def set_pending(self):
+        self.output_data=None
+        self.start_time=None
+        self.stop_time=None
+        self.status=status.ExecutionStatus.PENDING
+        self.errors=None
+        self.stdout=None
+        self.save()

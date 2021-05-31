@@ -4,6 +4,7 @@
 			<th>#</th>
 			<th>start</th>
 			<th>stop</th>
+			<th>flags</th>
 			<th>status</th>
 			<th>output</th>
 		</tr>
@@ -14,8 +15,13 @@
 			<td>{{exe.id}}</td>
 			<td>{{exe.start_time|date:'Y/m/d H:i:s'}}</td>
 			<td>{{exe.stop_time|date:'Y/m/d H:i:s'}}</td>
+		        <td>{{exe.flags}}</td>
 			<td>{{exe.status}}</td>
+			{% if exe.status == 0 %}
 			<td><a href="{% url 'output_download' exe.id %}">(output)</a></td>
+			{% else %}
+			<td>ERROR : {{exe.errors}}</td>
+			{% endif %}
 		</tr>
 		{% endfor %}
 	</tbody>

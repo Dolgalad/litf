@@ -1,8 +1,8 @@
 <tr>
 	<td><input type="checkbox" id="problem_id_{{ problem.id }}" name="problem_id_{{ problem.id }}"></td>
 	<td>{{ problem.id }}</td>
-	<td><a href="/problem/{{ problem.id }}">{{ problem.name }}</a></td>
-	<td>{{ problem.date }}</td>
+	<td><a href="/problem/{{ problem.id }}/">{{ problem.name }}</a></td>
+	<td>{{ problem.date|date:'Y/m/d H:i:s' }}</td>
 	<td>{{ problem.author }}</td>
 </tr>
 

@@ -7,7 +7,7 @@ from .views import DataAddView, DataEditView, DataDetailView
 from .models import CodeModel
 
 # output download view
-from .views import output_download_view
+from .views import output_download_view, stderr_download_view, stdout_download_view
 
 class CodeListView(ListView):
     model=CodeModel
@@ -25,4 +25,6 @@ urlpatterns = [
 
         # result download
         path("output/<int:exe_id>/", output_download_view, name="output_download"),
+        path("stderr/<int:exe_id>/", stderr_download_view, name="stderr_download"),
+        path("stdout/<int:exe_id>/", stdout_download_view, name="stdout_download"),
         ]

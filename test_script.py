@@ -88,6 +88,7 @@ def get_code_type(name,g,l):
         return FUNC_TYPE
     return UNKWN_TYPE
 def save_output(output):
+    print("Saving output : {}".format(output))
     pkl.dump(output,open(TEST_OUTPUT_FILENAME,"wb"))
     return 
     json.dump(output,open(TEST_OUTPUT_FILENAME,"w"))
@@ -110,22 +111,32 @@ def context_test(name, g, l , stdout_buffer):
     return get_code_type(name, g, l)
 def load_input_args(g,l,stdout_buffer,ct):
     in_args,in_kwargs=(),{}
+    print("loading input from : {} {}".format(INPUT_FILENAME, os.path.exists(INPUT_FILENAME)))
     if os.path.exists(INPUT_FILENAME):
         try:
+            print("a")
+            #print(open(INPUT_FILENAME,"r").read())
             in_args=pkl.load(open(INPUT_FILENAME,"rb"))
+            print("b")
             if isinstance(in_args, tuple):
                 in_args,in_kwargs=in_args
+                print("c")
                 return in_args, in_kwargs
+            print("d")
             return (in_args,),{}
         except Exception as e:
+            print("error : {}".format(e))
             save_output(err_output(INPUT_LOAD_ERROR,e,g,l,stdout_buffer.getvalue(),ct))
             exit(exit_code(INPUT_LOAD_ERROR))
     return in_args,in_kwargs
 def load_constr_args(g,l,stdout_buffer,ct):
     in_args,in_kwargs=(),{}
+    print("constructor input exists : {} {}".format(CONSTRUCTOR_INPUT_FILENAME, os.path.exists(CONSTRUCTOR_INPUT_FILENAME)))
     if os.path.exists(CONSTRUCTOR_INPUT_FILENAME):
         try:
+            print("trying to load constructor args")
             in_args,in_kwargs=pkl.load(open(CONSTRUCTOR_INPUT_FILENAME,"rb"))
+            print("done")
         except Exception as e:
             save_output(err_output(CONSTRUCTOR_INPUT_LOAD_ERROR,e,g,l,stdout_buffer.getvalue(),ct))
             exit(exit_code(CONSTRUCTOR_INPUT_LOAD_ERROR))
@@ -270,6 +281,7 @@ if __name__=="__main__":
                 output_info={"error_code":exit_code(UNKWN_CODE_ERROR),"error":"litf does not abide {}'s (yet)".format(code_type),"stdout":buf.getvalue()}
             # load input args
             i_args,i_kwargs=load_input_args(context_g,context_l,buf,code_type)
+            print("INPUT DATA : {}".format(i_args))
 
             if code_type==FUNC_TYPE:
                 # function instantiation test
@@ -293,7 +305,7 @@ if __name__=="__main__":
                 exit(exit_code(SUCCESS))
 
             # if there are input data but the object is not callable
-            print("has __call__ {}".format(hasattr(instance,"__call__")))
+            #print("has __call__ {}".format(hasattr(instance,"__call__")))
             if not hasattr(instance, "__call__"):
                 test_output=get_test_output(error_code=INSTANCE_NOT_CALLABLE_ERROR, error="code instance is not callable, perhaps you forgot to implement a __call__ method")
                 save_output(test_output)
@@ -301,17 +313,23 @@ if __name__=="__main__":
 
             # execute instance ( input_args)
             output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, context_g, context_l,buf, code_type)
-
             # if an output type was given
             if "output_type" in info_data:
                 output,ti_conv,tf_conv = output_conversion_test(info_data["output_type"], output, context_g, context_l, buf, code_type)
+            else:
+                # output should be serializable
+                output,ti_conv,tf_conv=output,None,None
+            print("output  : {}".format(output))
+            print("input :  {}".format(i_args))
             # if there were no errors until this point we can move on to postprocessing
-            print(list(info_data.keys()))
             postprocessing_info=[]
             if "postprocess" in info_data:
+                print("Postprocessing")
                 for process_name in info_data["postprocess"]:
+                    print("post process : {}".format(process_name))
                     print("Postprocessing : {}".format(process_name))
                     try:
+                        context_g["output"]=output
                         ev=eval("{}(output)".format(process_name),context_g)
                         print(ev)
                         postprocessing_info.append([process_name, ev])
@@ -328,8 +346,14 @@ if __name__=="__main__":
                                         stop_dt=tf)
             print("TEST OUTPUT : {}".format(test_output))
             if not output is None:
-                test_output["output"]=output
-                test_output["output_type"]=str(type(output))
+                # try to pickle output
+                try:
+                    test_output["output"]=pkl.dumps(output)
+                    test_output["output_type"]=str(type(output))
+                except Exception as e:
+                    test_output["output"]=None
+                    test_output["output_type"]=str(type(output))
+                    test_output["error"]="output not serializable"
             if (not ti is None) and (not tf is None):
                 test_output["start_dt"]=ti
                 test_output["stop_dt"]=tf

@@ -9,13 +9,13 @@ from apps.codes.forms import CodeModelForm
 from .forms import ProblemModelForm
 # my models
 from .models import ProblemModel
-from apps.codes.models import DataFileModel, CodeModel
-from apps.solvers.models import SolverModel
+from apps.codes.models import DataFileModel, CodeModel, ExecutionResultModel
+from apps.solvers.models import SolverModel, PostprocessingResultModel, SolverExecutionResultModel
 # debug
 from libs.utils import debug_print, delete_problems, get_checked_solvers, get_checked_datafiles, delete_datafiles, delete_solvers, get_checked_postprocesses, delete_postprocesses, get_checked_problems
 
 # tasks
-from .tasks import problem_submitted_task, problem_updated_task
+from .tasks import problem_submitted_task, problem_updated_task, postprocess_updated_task
 # Create your views here.
 
 class DetailView(TemplateView):
@@ -87,9 +87,26 @@ class DetailView(TemplateView):
         context["postprocess_delete_permission"]=(self.request.user.is_superuser or \
                                             self.request.user == problem.author)
         
-
+        # get list of solutions
+        context["solutions"]=self.get_solutions(problem)
 
         return context
+    def get_solutions(self,problem):
+        # get solvers
+        solvers=SolverModel.objects.filter(problem=problem)
+        if len(solvers)==0:
+            return []
+        # get solutions for each of these solvers
+        s=[]
+        for solver in solvers:
+            t_s=SolverExecutionResultModel.objects.filter(solver=solver)
+            # get the post processing results for each solution
+            t_p=[]
+            for sol in t_s:
+                t_p.append(PostprocessingResultModel.objects.filter(execution_result=sol.result))
+                print("sol : {}, process : {}".format(sol.id, t_p))
+                s.append((sol, t_p[-1]))
+        return s
 
 class IndexView(TemplateView):
     template_name="problems/index.html"
@@ -149,7 +166,7 @@ class EditView(UpdateView):
         return context
     def form_valid(self, form):
         self.object=form.save()
-        problem_updated_task.delay(self.object.data())
+        problem_updated_task.delay(self.object.id)
         return super().form_valid(form)
 
 class DataAddView(CreateView):
@@ -189,7 +206,7 @@ class PostprocessAddView(CreateView):
         problem=ProblemModel.objects.get(id=self.kwargs["pk"])
         problem.postprocess.add(self.object)
         problem.save()
-        problem_updated_task.delay(problem.data())
+        problem_updated_task.delay(problem.id)
         return super().form_valid(form)
     def get_context_data(self,**kwargs):
         context=super().get_context_data(**kwargs)
@@ -201,7 +218,8 @@ class PostprocessAddView(CreateView):
 
 
 class PostprocessEditView(UpdateView):
-    template_name="problems/postprocess_edit.html"
+    #template_name="problems/postprocess_edit.html"
+    template_name="codes/edit.html"
     model=CodeModel
     form_class=CodeModelForm
     def get_context_data(self,**kwargs):
@@ -213,8 +231,15 @@ class PostprocessEditView(UpdateView):
         return context
     def form_valid(self, form):
         self.object=form.save()
-        problem_updated_task.delay(self.object.data())
+        #problem_updated_task.delay(self.object.data())
+        postprocess_updated_task.delay(self.object.id)
         return super().form_valid(form)
+    def get_initial(self):
+        context=super().get_initial()
+        context["author"]=self.request.user
+        print("in PostprocessEditView.get_initial : {}".format(context))
+        return context
+
 
 class AboutView(TemplateView):
     template_name="about.html"

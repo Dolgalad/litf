@@ -4,6 +4,10 @@ from django.urls import reverse
 
 # import project common settings
 from libs import settings
+
+# import execution states
+from libs.code import status
+
 # import CodeModel and DataFileModel
 from apps.codes.models import CodeModel, DataFileModel, ExecutionResultModel
 # import ProblemModel
@@ -27,6 +31,24 @@ class SolverModel(models.Model):
                 "date":self.date,"description":self.description, "problem":self.problem.id}
     def html_link_detail(self):
         return "<a href=\"{}\">{}</a>".format(reverse("solver_detail",self.pk), self.name)
+    def get_execution_results(self):
+        return SolverExecutionResultModel.objects.filter(solver=self)
+    def get_pending_execution_result(self):
+        for exec_res in self.get_execution_results():
+            if exec_res.status==status.ExecutionStatus.PENDING:
+                return exec_res
+    def has_pending_execution_result(self):
+        e=self.get_pending_execution_result()
+        return not e is None
+    def create_pending_execution_result(self):
+        SolverExecutionResultModel.objects.create(solver=self,status=status.ExecutionStatus.PENDING)
+
+class SolverExecutionResultModel(models.Model):
+    solver=models.ForeignKey(SolverModel, on_delete=models.CASCADE)
+    status=models.IntegerField(default=-1)
+    result=models.ForeignKey(ExecutionResultModel, blank=True, null=True, on_delete=models.CASCADE)
+    def __str__(self):
+        return "SolverExecutionResultModel : status : {}".format(self.status)
 
 
 class PostprocessingResultModel(models.Model):

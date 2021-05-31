@@ -9,7 +9,7 @@ from django import forms
 
 import tempfile
 import os
-from io import StringIO
+from io import StringIO, BytesIO
 from wsgiref.util import FileWrapper
 
 # my forms
@@ -192,11 +192,14 @@ def getsize(f):
     return s
 def output_download_view(request,exe_id):
     file_content=ExecutionResultModel.objects.get(id=exe_id).output_data
-    print(type(file_content))
+    print("file content type : {}".format(type(file_content)))
     print(file_content)
     # file content in bytes
     if isinstance(file_content, bytes):
-        f=StringIO(file_content.decode("utf-8"))
+        try:
+            f=StringIO(file_content.decode("utf-8"))
+        except:
+            f=BytesIO(file_content)
     else:
         f=StringIO(file_content)
     s=getsize(f)
@@ -206,3 +209,28 @@ def output_download_view(request,exe_id):
     response["Content-Disposition"]="attachement; filename=output"
     response["Content-Length"]=s
     return response
+
+def stderr_download_view(request,exe_id):
+    file_content=ExecutionResultModel.objects.get(id=exe_id).errors
+    # file content in bytes
+    f=StringIO(file_content)
+    s=getsize(f)
+    wrapper=FileWrapper(f)
+    #response=HttpResponse(wrapper, content_type="text/plain")
+    response=HttpResponse(wrapper, content_type="text/plain")
+    response["Content-Disposition"]="attachement; filename=output"
+    response["Content-Length"]=s
+    return response
+
+def stdout_download_view(request,exe_id):
+    file_content=ExecutionResultModel.objects.get(id=exe_id).stdout
+    f=StringIO(file_content)
+    s=getsize(f)
+    wrapper=FileWrapper(f)
+    #response=HttpResponse(wrapper, content_type="text/plain")
+    response=HttpResponse(wrapper, content_type="text/plain")
+    response["Content-Disposition"]="attachement; filename=output"
+    response["Content-Length"]=s
+    return response
+
+

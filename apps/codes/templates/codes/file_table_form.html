@@ -24,7 +24,7 @@
 				<td><a href="{% url 'datafile_detail' file.id %}">{{file.datafile.name}}</a></td>
 				<td>{{file.datafile.size}}</td>
 				<td>{{file.flags}}</td>
-				<td>{{file.date}}</td>
+				<td>{{file.date|date:'Y/m/d H:i:s'}}</td>
 				<td>{{file.author}}</td>
 			</tr>
 			{% endfor %}
