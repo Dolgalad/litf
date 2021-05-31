@@ -30,19 +30,7 @@ from libs.code import status
 # Some settings
 VENV_CREATION_PATH="virtual_environements"
 OUTPUT_FILENAME="test_output.json"
-# regex 
-FUNC_DEF_RX="^[ ]*def[ ]+{}[ ]*\([ ]*\)[ ]*:[ ]*$"
-CLASS_DEF_RX="^[ ]*class[ ]+{}[ ]*:$"
-CLASS_INIT_RX="^[ ]*def[ ]+__init__[ ]*\([ ]*self[ ]*,[ ]*x\)[ ]*:$"
-def get_params(c_name, c_code):
-    class_def_re=CLASS_DEF_RX.format(c_name)
-    func_def_re=FUNC_DEF_RX.format(c_name)
-    print("CLASS DEFINITION REGEX : {}".format(class_def_re))
-    print("FUNC  DEFINITION REGEX : {}".format(func_def_re))
-    for line in c_code.split("\n"):
-        print("line re.match :\n\t{}\n\t{}".format(line,re.match(class_def_re, line)))
-        print("func match", "\n\t{}".format(line,re.match(func_def_re, line)))
-    return {}
+
 class CodeManager:
     @staticmethod
     def merge_codemodel_resources(a,b):
@@ -119,9 +107,12 @@ class CodeManager:
         return input_data
     @staticmethod
     def solver_run(solver_id, result=None):
+        msg="Solver_run : solver_id={}".format(solver_id)
+        if result is None:
+            msg+=", result={}".format(result.id)
+        print(msg)
+
         solver=SolverModel.objects.get(id=solver_id)
-        #print("solver_run , sol id : {}".format(result.id))
-        print(type(result))
 
         # delete all postprocessing results for this solvers results
         ppr=PostprocessingResultModel.objects.filter(problem=solver.problem, solver=solver).all().delete()
@@ -155,15 +146,13 @@ class CodeManager:
         venv=VirtualEnv(venv_dir, resources=resources)
 
         # add input data
-        print("input_data : {}".format(input_data))
-        print(pkl.load(open(input_data[0],"rb")))
         venv.move_input_data(input_data)
         # add info file
         venv.save_info_file(info_data)
 
         # execute the test script and get output
         output=CodeManager.run_test_and_get_output(venv, "{} code".format(solver.implementation.name))
-        print("OUTPUT EXIT CODE : {}".format(output["error_code"]))
+        print("\texit_code={}".format(output["error_code"]))
         # if the output is a string and a file exists with the same name in the virtual environement
 
         # save the output
@@ -171,10 +160,8 @@ class CodeManager:
         erm.save()
 
         # postprocessing
-
-        print(output)
         if "postprocessing" in output:
-            print(output["postprocessing"])
+            print("\tpostprocessing : {}".format(output["postprocessing"]))
             for [process_name, process_out] in output["postprocessing"]:
                 process_obj=None
                 for ppp in solver.problem.postprocess.all():
@@ -182,7 +169,6 @@ class CodeManager:
                         process_obj=ppp
                 if process_obj is None:
                     continue
-                print("process out : ",process_out)
                 if isinstance(process_out, str):
                     pp=os.path.join(venv.path, process_out)
                     os.system("ls {}".format(venv.path))
@@ -232,7 +218,6 @@ class CodeManager:
     @staticmethod
     def save_output_erm(cm, output, input_data=None, flags=None, erm=None):
         # save the model
-        print(type(erm))
         if erm is None:
             erm=cm.get_pending_execution_result()
         erm.input_data=input_data
@@ -250,7 +235,6 @@ class CodeManager:
         return erm
     @staticmethod
     def save_output_solver_erm(solver, cm, output, input_data=None, flags=None, result=None):
-        print("in save_output_solver_erm : {}".format(type(result)))
         # save the model
         if result is None:
             erm=solver.get_pending_execution_result()
@@ -282,15 +266,11 @@ class CodeManager:
             erm.result.save()
         erm.status=erm.result.status
         erm.save()
-        print("Solver erm saved")
-        print(erm.result)
-        print(type(erm))
 
         return erm
     @staticmethod
     def check_code_dependants(code_id):
         cm=CodeModel.objects.get(id=code_id)
-        print("Checking code dependants for {}".format(cm))
         # get list of all codes that need to be checked because they depend on the current code
         dependants=cm.get_dependants()
         for d in dependants:
@@ -300,19 +280,21 @@ class CodeManager:
         print("get codemodel input data")
         # check the codemodels parameters
         if cm.arguments is None:
+            print("\tcodemodel has no arguments 1")
             return []
         cm_params = json.loads(cm.arguments.data)
         if cm_params is None:
+            print("\tcodemodel has no arguments 2")
             return []
         # get input data compatible with the number of positional arguments
         n=len(cm_params["args"])
-        print("n : {}".format(n))
         if n==0:
+            print("\tcodemodel has no arguments 3")
             return []
         # store some floats in a pkl file
         in_dat=tuple(list(range(n)))
-        print("in dat : {}".format(in_dat))
         pkl.dump((in_dat,{}), open("temp_input_data.pkl","wb"))
+        print("\tinput_data : {}".format(in_dat))
         return ["temp_input_data.pkl"]
 
     @staticmethod
@@ -344,7 +326,6 @@ class CodeManager:
         # get pending results
         pending_res=ExecutionResultModel.objects.filter(implementation=code_id)
         pending_res=pending_res.filter(status=status.ExecutionStatus.PENDING)
-        print("PENDING RESULTS : {}".format(pending_res))
         for res in pending_res:
             CodeManager.codemodel_execute_result(cm, res)
 
@@ -397,7 +378,6 @@ class CodeManager:
         # set all previous results to pending and remove all integrity checks
         exec_list=ExecutionResultModel.objects.filter(implementation=code_id).all()
         for e in exec_list:
-            print(e.flags)
             if e.flags is None:
                 e.set_pending()
             elif "integrity"== e.flags:
