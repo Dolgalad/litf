@@ -19,3 +19,32 @@ class ExecutionStatus:
     PENDING=1
     FAIL=2
     RUNNING=3
+
+class CodeExecutionStatus:
+    SUCCESS=0
+    MISSING_CODE_FILE=1
+    NAME_NOT_IN_CONTEXT=2
+    DECLARATION_ERROR=3
+    INSTANTIATION_ERROR=4
+    EXECUTION_ERROR=5
+    OUTPUT_NOT_PKL_SERIALIZABLE=6
+    INPUT_LOAD_ERROR=7
+    CONSTRUCTOR_INPUT_LOAD_ERROR=8
+    CLASS_INSTANTIATION_ERROR=9
+    UNKWN_CODE_TYPE=10
+    OUTPUT_CONVERSION_ERROR=11
+    UNCHECKED=-1
+
+execution_status_msg={-1:"unchecked",\
+                      0:"success",\
+                      1:"missing_code_file",\
+                      2:"name_not_in_context",\
+                      3:"declaration_error",\
+                      4:"instantiation_error",\
+                      5:"execution_error",\
+                      6:"output_unserializable",\
+                      7:"input_load_error",\
+                      8:"constructor_input_load_error",\
+                      9:"class_instantiation_error",\
+                      10:"unknown_code_type",\
+                      11:"output_conversion_error"}

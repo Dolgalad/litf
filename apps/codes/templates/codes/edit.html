@@ -7,7 +7,14 @@
 	{% csrf_token %}
 	<input type="hidden" name="_popup" value="1">
 <input type="hidden" name="_to_field" value="id">
-{{ form.as_p }}
+<table class="blueTable">
+	<thead>
+		<tr>
+			<th colspan="2">Code edit</th>
+		</tr>
+	</thead>
+{{ form.as_table }}
+</table>
 
 <div class="submit-row">
 <input type="submit" name="submit" value="Save"/>

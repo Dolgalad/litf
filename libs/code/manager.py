@@ -108,7 +108,7 @@ class CodeManager:
     @staticmethod
     def solver_run(solver_id, result=None):
         msg="Solver_run : solver_id={}".format(solver_id)
-        if result is None:
+        if not result is None:
             msg+=", result={}".format(result.id)
         print(msg)
 

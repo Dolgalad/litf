@@ -1,11 +1,18 @@
 {% extends 'base.html' %}
 
 {% block main_block %}
-<h2>Login</h2>
 
 <form method="post" role="form" action="/login/">
 	{% csrf_token %}
-	{{ form.as_p }}
+	<table class="blueTable">
+		<thead>
+			<tr>
+				<th colspan="2">Login</th>
+			</tr>
+		</thead>
+		
+	{{ form.as_table }}
+	</table>
 	<input type="submit" name="login" value="Login"/>
 	<input type="submit" name="register" value="Register"/>
 </form>

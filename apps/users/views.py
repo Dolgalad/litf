@@ -22,23 +22,20 @@ class LoginView(FormView):
     form_class=LoginForm
     success_url="/profile"
     def post(self, request):
-        print(request.POST)
         if "register" in request.POST:
             return HttpResponseRedirect(reverse("register"))
         form=self.form_class(request.POST)
         if self.form_valid(form):
-            print("form is valid")
             username=request.POST["username"]
             password=request.POST["password"]
-            print("username: {}\npassword: {}".format(username,password))
             user=authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 print("In LoginView.post : just before redirect")
-                return HttpResponseRedirect("/profile")
+                return HttpResponseRedirect(reverse("profile"))
         else:
             print("WARNING : authenticate failed : {}".format(request.POST))
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse("login"))
     def get(self, request):
         if request.user.is_authenticated:
             return HttpResponseRedirect(reverse("profile"))

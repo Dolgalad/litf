@@ -4,7 +4,9 @@
 <h2>Problem creation</h2>
 <form method="post">
 {% csrf_token %}
-{{ form.as_p }}
+<table class="blueTable">
+{{ form.as_table }}
+</table>
 <input type="submit" id="submit_problem" name="submit_problem" value="Submit"/>
 <input type="reset" id="reset_problem" name="reset_problem" value="Reset"/>
 <a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>

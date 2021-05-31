@@ -1,4 +1,5 @@
-<table>
+{% load problems_tags %}
+<table class="blueTable">
 	<thead>
 		<tr>
 			<th>#</th>
@@ -16,7 +17,7 @@
 			<td>{{exe.start_time|date:'Y/m/d H:i:s'}}</td>
 			<td>{{exe.stop_time|date:'Y/m/d H:i:s'}}</td>
 		        <td>{{exe.flags}}</td>
-			<td>{{exe.status}}</td>
+			<td>{{exe.status|translate_status}}</td>
 			{% if exe.status == 0 %}
 			<td><a href="{% url 'output_download' exe.id %}">(output)</a></td>
 			{% else %}
