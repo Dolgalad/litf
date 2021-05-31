@@ -88,7 +88,6 @@ def get_code_type(name,g,l):
         return FUNC_TYPE
     return UNKWN_TYPE
 def save_output(output):
-    print("Saving output : {}".format(output))
     pkl.dump(output,open(TEST_OUTPUT_FILENAME,"wb"))
     return 
     json.dump(output,open(TEST_OUTPUT_FILENAME,"w"))
@@ -111,32 +110,23 @@ def context_test(name, g, l , stdout_buffer):
     return get_code_type(name, g, l)
 def load_input_args(g,l,stdout_buffer,ct):
     in_args,in_kwargs=(),{}
-    print("loading input from : {} {}".format(INPUT_FILENAME, os.path.exists(INPUT_FILENAME)))
     if os.path.exists(INPUT_FILENAME):
         try:
-            print("a")
             #print(open(INPUT_FILENAME,"r").read())
             in_args=pkl.load(open(INPUT_FILENAME,"rb"))
-            print("b")
             if isinstance(in_args, tuple):
                 in_args,in_kwargs=in_args
-                print("c")
                 return in_args, in_kwargs
-            print("d")
             return (in_args,),{}
         except Exception as e:
-            print("error : {}".format(e))
             save_output(err_output(INPUT_LOAD_ERROR,e,g,l,stdout_buffer.getvalue(),ct))
             exit(exit_code(INPUT_LOAD_ERROR))
     return in_args,in_kwargs
 def load_constr_args(g,l,stdout_buffer,ct):
     in_args,in_kwargs=(),{}
-    print("constructor input exists : {} {}".format(CONSTRUCTOR_INPUT_FILENAME, os.path.exists(CONSTRUCTOR_INPUT_FILENAME)))
     if os.path.exists(CONSTRUCTOR_INPUT_FILENAME):
         try:
-            print("trying to load constructor args")
             in_args,in_kwargs=pkl.load(open(CONSTRUCTOR_INPUT_FILENAME,"rb"))
-            print("done")
         except Exception as e:
             save_output(err_output(CONSTRUCTOR_INPUT_LOAD_ERROR,e,g,l,stdout_buffer.getvalue(),ct))
             exit(exit_code(CONSTRUCTOR_INPUT_LOAD_ERROR))
@@ -194,7 +184,6 @@ def output_conversion_test(output_type_name, out, g, l, b, c):
     try:
         context_g["output"]=output
         ti=datetime.datetime.now()
-        print("CMD  : {}(output)".format(output_type_name))
         oto=eval("{}(output)".format(output_type_name),g)
         tf=datetime.datetime.now()
         # if has dump method try to write to "output_data.dat"
@@ -205,7 +194,6 @@ def output_conversion_test(output_type_name, out, g, l, b, c):
         # dump to "output_data.dat"
         context_g["oto"]=oto
         exec("oto.dump(\"output_data.dat\")", g)
-        print("GOOD")
     except Exception as e:
         save_output(err_output(OUTPUT_CONVERSION_ERROR,e, g, l, b.getvalue(), c))
         exit(exit_code(OUTPUT_CONVERSION_ERROR))
@@ -264,11 +252,9 @@ if __name__=="__main__":
         constr=eval(name, glo, loc)
         solver=constr()
         y=solver(x)
-        print("Simulation run done")
 
     if req_type=="code":
         with io.StringIO() as buf, redirect_stdout(buf):
-            print("INFO : {}".format(info_data))
             glo,loc=[k for k in globals()], [k for k in locals()]
             # declaration code execution
             declaration_test(code, context_g, context_l, buf)
@@ -281,7 +267,6 @@ if __name__=="__main__":
                 output_info={"error_code":exit_code(UNKWN_CODE_ERROR),"error":"litf does not abide {}'s (yet)".format(code_type),"stdout":buf.getvalue()}
             # load input args
             i_args,i_kwargs=load_input_args(context_g,context_l,buf,code_type)
-            print("INPUT DATA : {}".format(i_args))
 
             if code_type==FUNC_TYPE:
                 # function instantiation test
@@ -289,7 +274,6 @@ if __name__=="__main__":
             elif code_type==CLASS_TYPE:
                 # load constructor args
                 c_args,c_kwargs=load_constr_args(context_g,context_l,buf,code_type)
-                #print("Input args : {}, {}".format(i_args,i_kwargs))
                 # constructor instantiation test
                 constructor_f=function_instantiation_test(name,context_g,context_l, buf,code_type)
                 # class instantiation test
@@ -305,7 +289,6 @@ if __name__=="__main__":
                 exit(exit_code(SUCCESS))
 
             # if there are input data but the object is not callable
-            #print("has __call__ {}".format(hasattr(instance,"__call__")))
             if not hasattr(instance, "__call__"):
                 test_output=get_test_output(error_code=INSTANCE_NOT_CALLABLE_ERROR, error="code instance is not callable, perhaps you forgot to implement a __call__ method")
                 save_output(test_output)
@@ -319,19 +302,13 @@ if __name__=="__main__":
             else:
                 # output should be serializable
                 output,ti_conv,tf_conv=output,None,None
-            print("output  : {}".format(output))
-            print("input :  {}".format(i_args))
             # if there were no errors until this point we can move on to postprocessing
             postprocessing_info=[]
             if "postprocess" in info_data:
-                print("Postprocessing")
                 for process_name in info_data["postprocess"]:
-                    print("post process : {}".format(process_name))
-                    print("Postprocessing : {}".format(process_name))
                     try:
                         context_g["output"]=output
                         ev=eval("{}(output)".format(process_name),context_g)
-                        print(ev)
                         postprocessing_info.append([process_name, ev])
                     except Exception as e:
                         print("postprocessing error - {} : \n{}".format(process_name, e))
@@ -344,7 +321,6 @@ if __name__=="__main__":
                                         error=None,
                                         start_dt=ti,\
                                         stop_dt=tf)
-            print("TEST OUTPUT : {}".format(test_output))
             if not output is None:
                 # try to pickle output
                 try:
