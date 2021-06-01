@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django import forms
 
+import json
 import tempfile
 import os
 from io import StringIO, BytesIO
@@ -81,6 +82,11 @@ class DetailView(TemplateView):
         er=cm.get_execution_results()
         if len(er):
             context["execution_results"]=er
+        if not cm.arguments is None:
+            ad=json.loads(cm.arguments.data)
+            context["argument_description"]=ad
+            context["pos_argument_description"]=ad["args"]
+            context["kw_argument_description"]=ad["kwargs"]
         return context
 
 class EditView(UpdateView):
@@ -192,8 +198,6 @@ def getsize(f):
     return s
 def output_download_view(request,exe_id):
     file_content=ExecutionResultModel.objects.get(id=exe_id).output_data
-    print("file content type : {}".format(type(file_content)))
-    print(file_content)
     # file content in bytes
     if isinstance(file_content, bytes):
         try:

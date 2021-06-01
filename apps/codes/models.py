@@ -113,13 +113,13 @@ class CodeModel(models.Model):
         return ExecutionResultModel.objects.filter(implementation=self)
     def get_pending_execution_result(self):
         for exec_res in self.get_execution_results():
-            if exec_res.status==status.ExecutionStatus.PENDING:
+            if exec_res.status==status.CodeExecutionStatus.PENDING:
                 return exec_res
     def has_pending_execution_result(self):
         a=self.get_pending_execution_result()
         return not a is None
     def create_pending_execution_result(self):
-        ep=ExecutionResultModel.objects.create(implementation=self,status=status.ExecutionStatus.PENDING)
+        ep=ExecutionResultModel.objects.create(implementation=self,status=status.CodeExecutionStatus.PENDING)
         ep.save()
 
 class ExecutionResultModel(models.Model):
@@ -148,7 +148,7 @@ class ExecutionResultModel(models.Model):
         self.output_data=None
         self.start_time=None
         self.stop_time=None
-        self.status=status.ExecutionStatus.PENDING
+        self.status=status.CodeExecutionStatus.PENDING
         self.errors=None
         self.stdout=None
         self.save()

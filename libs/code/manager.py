@@ -63,9 +63,14 @@ class CodeManager:
     @staticmethod
     def run_test_and_get_output(venv, params=""):
         ts=venv.run_test_script(params)
+        print("run_test_and_get_output : {}".format(ts))
         # check if output file exists
         if not os.path.exists(os.path.join(venv.path,"test_output.json")):
-            return {"error_code":-2, "error":"output file not found","stdout":""}
+            errs="output file not found"
+            if ts.has_errors():
+                errs+=str(ts.stderr)
+            
+            return {"error_code":-2, "error":errs,"stdout":"", "output":None, "output_type":None, "start_dt":None, "stop_dt": None}
         return CodeManager.load_output(venv.path)
     @staticmethod
     def get_solver_venv_dir(problem_id, solver_id):
@@ -97,7 +102,8 @@ class CodeManager:
 
     @staticmethod
     def get_problem_solver_input_data(solver):
-        input_data=[f.datafile.path for f in solver.problem.input_data.all()]
+        input_data=[f.datafile.path for f in solver.problem.input_data.all() if f.flags=="input"]
+        print("input data : {}".format(input_data))
         # if no input data available
         if input_data==[]:
             # create a temporary file
@@ -153,6 +159,8 @@ class CodeManager:
         # execute the test script and get output
         output=CodeManager.run_test_and_get_output(venv, "{} code".format(solver.implementation.name))
         print("\texit_code={}".format(output["error_code"]))
+        if not "output" in output:
+            output["output"]=None
         # if the output is a string and a file exists with the same name in the virtual environement
 
         # save the output
@@ -325,7 +333,7 @@ class CodeManager:
         cm=CodeModel.objects.get(id=code_id)
         # get pending results
         pending_res=ExecutionResultModel.objects.filter(implementation=code_id)
-        pending_res=pending_res.filter(status=status.ExecutionStatus.PENDING)
+        pending_res=pending_res.filter(status=status.CodeExecutionStatus.PENDING)
         for res in pending_res:
             CodeManager.codemodel_execute_result(cm, res)
 
@@ -353,6 +361,7 @@ class CodeManager:
 
         # run the testing script
         output=CodeManager.run_test_and_get_output(venv, "{} code".format(cm.name))
+        print(output)
 
 
         # save the output

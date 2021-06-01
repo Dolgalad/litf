@@ -10,6 +10,17 @@ def code_submitted_task(code_id):
 
 @shared_task
 def code_updated_task(code_id):
+    # check status of dependencies
+    #    if has_invalid_dependency : set status to DEPENDENCY_ERROR
+
+    # get list of code objects that depend on this item
+    # interrupt all executions that involve an item in the dependance graph
+    # clear set state to PENDING for all items in the dependency graph
+    # starting from the root, execute integrity check of the graph
+    from litf.celery import app
+    i=app.control.inspect()
+    print(i.active())
+
     print("code_updated_task : {}".format(code_id))
     CodeManager.codemodel_set_execution_pending(code_id)
     # check codes status

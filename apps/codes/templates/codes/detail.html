@@ -6,7 +6,10 @@
   <a href="{% url 'code_edit' code.id %}">Edit</a><br/>
   <h2>Implementation</h2>
       {% include 'codes/code_textarea.html' with code=code.code %}
-      
+ 
+      <h3>Arguments</h3>
+          {% include 'codes/argument_table.html' %}
+
       {% if requirements %}
         <h3>Requirements</h3>
         {% include 'codes/requirements_table.html' %}

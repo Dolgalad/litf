@@ -2,6 +2,6 @@
 	<td><input type="checkbox" name="solver_id_{{solver.id}}"></td>
 	<td>{{solver.id}}</td>
 	<td><a href="{% url 'solver_detail' solver.id %}">{{ solver.name }}</a></td>
-	<td>{{ solver.date }}</td>
+	<td>{{ solver.date|date:'Y/m/d H:i:s' }}</td>
 	<td>{{ solver.author }}</td>
 </tr>

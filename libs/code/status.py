@@ -33,9 +33,12 @@ class CodeExecutionStatus:
     CLASS_INSTANTIATION_ERROR=9
     UNKWN_CODE_TYPE=10
     OUTPUT_CONVERSION_ERROR=11
+    PENDING=12
+    RUNNING=13
     UNCHECKED=-1
 
-execution_status_msg={-1:"unchecked",\
+execution_status_msg={-2:"failure",\
+                      -1:"unchecked",\
                       0:"success",\
                       1:"missing_code_file",\
                       2:"name_not_in_context",\
@@ -47,4 +50,6 @@ execution_status_msg={-1:"unchecked",\
                       8:"constructor_input_load_error",\
                       9:"class_instantiation_error",\
                       10:"unknown_code_type",\
-                      11:"output_conversion_error"}
+                      11:"output_conversion_error",\
+                      12:"pending",\
+                      13:"running"}

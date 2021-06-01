@@ -8,7 +8,7 @@
 			  <td><input type="checkbox" name="{{prefix}}_id_{{ code.id }}"></td>
 			  <td>{{ code.id }}</td>
 			  <td><a href="/code/{{ code.id }}/">{{ code.name }}</a></td>
-			  <td>{{ code.date }}</td>
+			  <td>{{ code.date|date:'Y/m/d H:i:s' }}</td>
 			  <td>{{ code.author }}</td>
 		  </tr>
 	{% endfor %}

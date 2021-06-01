@@ -35,13 +35,13 @@ class SolverModel(models.Model):
         return SolverExecutionResultModel.objects.filter(solver=self)
     def get_pending_execution_result(self):
         for exec_res in self.get_execution_results():
-            if exec_res.status==status.ExecutionStatus.PENDING:
+            if exec_res.status==status.CodeExecutionStatus.PENDING:
                 return exec_res
     def has_pending_execution_result(self):
         e=self.get_pending_execution_result()
         return not e is None
     def create_pending_execution_result(self):
-        SolverExecutionResultModel.objects.create(solver=self,status=status.ExecutionStatus.PENDING)
+        SolverExecutionResultModel.objects.create(solver=self,status=status.CodeExecutionStatus.PENDING)
 
 class SolverExecutionResultModel(models.Model):
     solver=models.ForeignKey(SolverModel, on_delete=models.CASCADE)

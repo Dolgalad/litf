@@ -181,8 +181,11 @@ def execution_test(f,args,kwargs,g,l,stdout_buffer,ct):
     return y,ti,tf
 
 def output_conversion_test(output_type_name, out, g, l, b, c):
+    #print("output_conversion_test : out_type_name:{}".format(output_type_name))
+    #print("input type : {}".format(type(out)))
+    #print("context_g contains {} : {}".format("output", "output" in g))
     try:
-        context_g["output"]=output
+        g["output"]=out
         ti=datetime.datetime.now()
         oto=eval("{}(output)".format(output_type_name),g)
         tf=datetime.datetime.now()
@@ -192,11 +195,12 @@ def output_conversion_test(output_type_name, out, g, l, b, c):
             return output,ti,tf
         
         # dump to "output_data.dat"
-        context_g["oto"]=oto
+        g["oto"]=oto
         exec("oto.dump(\"output_data.dat\")", g)
     except Exception as e:
         save_output(err_output(OUTPUT_CONVERSION_ERROR,e, g, l, b.getvalue(), c))
         exit(exit_code(OUTPUT_CONVERSION_ERROR))
+    return output, ti, tf
     return "output_data.dat",ti,tf
 
 def get_test_output(error_code=-1, stdout=None, c_type=2, _globals=None, _locals=None, error=None,\
@@ -296,19 +300,30 @@ if __name__=="__main__":
 
             # execute instance ( input_args)
             output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, context_g, context_l,buf, code_type)
-            # if an output type was given
             if "output_type" in info_data:
+                #print("converting to output type : {}".format(info_data["output_type"]))
+                #print("Type before : {}".format(type(output)))
                 output,ti_conv,tf_conv = output_conversion_test(info_data["output_type"], output, context_g, context_l, buf, code_type)
+                #print("Type after : {}".format(type(output)))
+                # if the output was dumped to an output file OUTPUT_DUMP then store its contents
             else:
                 # output should be serializable
                 output,ti_conv,tf_conv=output,None,None
+            # if output data file exist save its data
+            output_file_content=None
+            if os.path.exists("output_data.dat"):
+                output_file_content=open("output_data.dat","rb").read()
+            
             # if there were no errors until this point we can move on to postprocessing
             postprocessing_info=[]
             if "postprocess" in info_data:
+                #print(info_data["postprocess"])
                 for process_name in info_data["postprocess"]:
                     try:
                         context_g["output"]=output
+                        #print("postprocess input type : {}".format(type(output)))
                         ev=eval("{}(output)".format(process_name),context_g)
+                        #print("postprocess output type : {}".format(type(ev)))
                         postprocessing_info.append([process_name, ev])
                     except Exception as e:
                         print("postprocessing error - {} : \n{}".format(process_name, e))
@@ -324,8 +339,12 @@ if __name__=="__main__":
             if not output is None:
                 # try to pickle output
                 try:
-                    test_output["output"]=pkl.dumps(output)
-                    test_output["output_type"]=str(type(output))
+                    if output_file_content is None:
+                        test_output["output"]=pkl.dumps(output)
+                        test_output["output_type"]=str(type(output))
+                    else:
+                        test_output["output"]=output_file_content
+                        test_output["output_type"]=str(type(output))
                 except Exception as e:
                     test_output["output"]=None
                     test_output["output_type"]=str(type(output))

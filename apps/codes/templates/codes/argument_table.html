@@ -1,0 +1,46 @@
+{% if code.arguments %}
+      
+      <table class="blueTable">
+	      
+	      <thead>
+		      <tr>
+			      <th>arg key</th><th>dtype</th><th>default</th>
+		      </tr>
+	      </thead>
+        {% if pos_argument_description %}
+	<tbody>
+	  {% for pos_arg in pos_argument_description %}
+	    <tr>
+		    <td>{{pos_arg.key}}</td>
+		    <td>{% if pos_arg.dtype %}{{pos_arg.dtype}}{% endif %}</td>
+		    <td><input type="text" value="{{pos_arg.default}}"></td>
+
+	    </tr>
+	  {% endfor %}
+	</tbody>
+	{% endif %}
+
+	{% if kw_argument_description %}
+	<thead>
+		<tr>
+			<th colspan="3">
+				Keyword arguments</th></tr>
+	</thead>
+	<tbody>
+	  {% for kw_arg in kw_argument_description %}
+	  <tr><td>{{kw_arg.key}}</td>
+		  <td>{% if kw_arg.dtype %}{{kw_arg.dtype}}{% endif %}</td>
+		  <td>{{kw_arg.default}}</td>
+	  </tr>
+	  {% endfor %}
+	</tbody>
+	{% endif %}
+              <tfoot>
+		      <a href="#">Request solution</a>
+	      </tfoot>
+      </table>
+      {% else %}
+        No arguments<br/>
+      {% endif %}
+
+

@@ -3,14 +3,43 @@
 :email: alexandre.schulz@irap.omp.eu
 :brief: utilities for managing virual environements
 """
+import time
+import io
+import signal
 import sys
 import os
 import json
 import subprocess
 import venv
+import psutil
+
+
+def kill_hard(proc_pid):
+    process = psutil.Process(proc_pid)
+    for proc in process.children(recursive=True):
+        proc.kill()
+    process.kill()
+def get_pids(proc_pid):
+    a=[]
+    try:
+        process=psutil.Process(proc_pid)
+    except:
+        return []
+    for proc in process.children(recursive=True):
+        a.append(proc.pid)
+    a.append(process.pid)
+    return a
+def kill_all(pids):
+    print("kill_all : {}".format(pids))
+    for pid in pids:
+        try:
+            psutil.Process(pid).kill()
+        except Exception as e:
+            print("in kill_all : {}".format(e))
 
 # location of the test_script.py script
 TEST_SCRIPT_PATH="test_script.py"
+EXECUTION_TIMEOUT=600
 class VEnvOutput:
     def __init__(self, stdout=None, stderr=None):
         self.stdout=stdout
@@ -68,12 +97,39 @@ class VirtualEnv:
                 f.write(requirements)
             f.close()
     def check_output(self,call):
+        print("Checkoutput for : {}".format(call))
         c="{} ; {} ; {}".format(self.activate_cmd(),call,"deactivate")
+        pids=[]
         try:
-            a=subprocess.check_output(c,shell=True).decode("utf-8")
-            return VEnvOutput(stdout=a)
+            #proc=subprocess.Popen("/bin/bash", stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            #activate_out=proc.communicate(input=c.encode(),timeout=EXECUTION_TIMEOUT)
+            #print("wait")
+            #proc.wait()
+            proc=subprocess.Popen(c,shell=True,preexec_fn=os.setsid)
+            time.sleep(.1)
+            pids=get_pids(proc.pid)
+            (stdout,stderr)=proc.communicate(timeout=EXECUTION_TIMEOUT)
+            #a=subprocess.check_output(c,shell=True).decode("utf-8")
+            if stdout is None:
+                ans=VEnvOutput(stdout="")
+            else:
+                ans=VEnvOutput(stdout=stdout)
         except subprocess.CalledProcessError as e:
-            return VEnvOutput(stderr=e)
+            ans= VEnvOutput(stderr=e)
+        except subprocess.TimeoutExpired as e:
+            ans=VEnvOutput(stderr="Timeout error\n{}".format(e))
+            # KILL
+            proc.kill()
+            for p in pids:
+                try:
+                    kill_hard(p)
+                except:
+                    print("hard kill arror")
+
+        except Exception as e:
+            ans=VEnvOutput(stderr=e)
+        return ans
+
     def activate_cmd(self):
         return ". "+os.path.join(self.path,"bin/activate")
     def exec_file(self, filename, args):

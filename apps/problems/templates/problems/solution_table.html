@@ -28,9 +28,9 @@
 			<td>{{sol.result.start_time|date:'Y/m/d H:i:s'}}</td>
 			<td>{{sol.result.stop_time|date:'Y/m/d H:i:s'}}</td>
 			<td>{{sol.status|translate_status}}</td>
-			<td><a href="{% url 'output_download' sol.result.id %}">(output)</a>
+			<td>{% if sol.result %}<a href="{% url 'output_download' sol.result.id %}">(output)</a>
 			<a href="{% url 'stderr_download' sol.result.id %}">(stderr)</a>
-			<a href="{% url 'stdout_download' sol.result.id %}">(stdout)</a></td>
+			<a href="{% url 'stdout_download' sol.result.id %}">(stdout)</a>{% endif %}</td>
 			{% if pp %}
 			  {% for p in pp %}
 			  <td>{% autoescape off %}{{p.html_render}}{% endautoescape %}</td>
