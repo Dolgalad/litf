@@ -27,7 +27,7 @@ Input type : float
 {% endif %}
 
 {% if problem.output_type %}
-Output type : <a href="{% url 'code_detail' problem.input_type.id %}">{{problem.output_type.name}}</a><br/>
+Output type : <a href="{% url 'code_detail' problem.output_type.id %}">{{problem.output_type.name}}</a><br/>
 {% else %}
 Output type : float
 {% endif %}
