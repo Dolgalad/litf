@@ -44,6 +44,14 @@ class CodeModel(models.Model):
                     a.append(c)
         return a
     def depends(self, d):
+        if d==self:
+            return True
+        if d in self.dependencies.all():
+            return True
+        for dep in self.dependencies.all():
+            if dep.depends(d):
+                return True
+        return False
         return d in self.dependencies.all()
     def get_execution_results(self):
         return ExecutionResultModel.objects.filter(implementation=self)

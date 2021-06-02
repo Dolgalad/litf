@@ -51,5 +51,6 @@ execution_status_msg={-2:"failure",\
                       9:"class_instantiation_error",\
                       10:"unknown_code_type",\
                       11:"output_conversion_error",\
-                      12:"pending",\
-                      13:"running"}
+                      12:"instance_not_callable_error",\
+                      13:"pending",\
+                      14:"running"}

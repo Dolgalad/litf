@@ -4,7 +4,14 @@
 <h2>Solver creation</h2>
 <form method="post">
 {% csrf_token %}
-{{ form.as_p }}
+<table class="blueTable">
+	<thead>
+		<tr>
+			<th colspan="2">Create solver</th>
+		</tr>
+	</thead>
+{{ form.as_table }}
+</table>
 <input type="submit" id="submit_solver" name="submit_solver" value="Submit"/>
 <input type="reset" id="reset_solver" name="reset_solver" value="Reset"/>
 <a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>

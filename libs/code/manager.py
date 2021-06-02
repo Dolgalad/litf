@@ -64,6 +64,8 @@ class CodeManager:
     def run_test_and_get_output(venv, params=""):
         ts=venv.run_test_script(params)
         print("run_test_and_get_output : {}".format(ts))
+        print("stdout : {}".format(ts.stdout))
+        print("stderr : {}".format(ts.stderr))
         # check if output file exists
         if not os.path.exists(os.path.join(venv.path,"test_output.json")):
             errs="output file not found"
@@ -71,7 +73,11 @@ class CodeManager:
                 errs+=str(ts.stderr)
             
             return {"error_code":-2, "error":errs,"stdout":"", "output":None, "output_type":None, "start_dt":None, "stop_dt": None}
-        return CodeManager.load_output(venv.path)
+        out=CodeManager.load_output(venv.path)
+        print("exit code : {}".format(out["error_code"]))
+        print("stdout : {}".format(out["stdout"]))
+        print("error  : {}".format(out["error"]))
+        return out
     @staticmethod
     def get_solver_venv_dir(problem_id, solver_id):
         dirname="{}_{}_venv".format(problem_id, solver_id)

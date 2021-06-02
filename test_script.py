@@ -26,6 +26,7 @@ CONSTRUCTOR_INPUT_LOAD_ERROR="constructor_input_load_error"
 CLASS_INSTANTIATION_ERROR="class_instantiation_error"
 UNKWN_CODE_TYPE="unkwnown_code_type"
 OUTPUT_CONVERSION_ERROR="output_conversion_error"
+INSTANCE_NOT_CALLABLE_ERROR="instance_not_callable_error"
 
 # code types
 CLASS_TYPE=0
@@ -57,6 +58,8 @@ def exit_code(err):
         return 10
     elif err==OUTPUT_CONVERSION_ERROR:
         return 11
+    elif err==INSTANCE_NOT_CALLABLE_ERROR:
+        return 12
     else:
         return -1
 
@@ -167,6 +170,7 @@ def class_instantiation_test(constr_f, c_args, c_kwargs, g, l, stdout_buffer,ct)
 
    
 def execution_test(f,args,kwargs,g,l,stdout_buffer,ct):
+    print("execution test : {}".format(f))
     y=None
     ti,tf=None,None
     try:
@@ -181,8 +185,8 @@ def execution_test(f,args,kwargs,g,l,stdout_buffer,ct):
     return y,ti,tf
 
 def output_conversion_test(output_type_name, out, g, l, b, c):
-    #print("output_conversion_test : out_type_name:{}".format(output_type_name))
-    #print("input type : {}".format(type(out)))
+    print("output_conversion_test : out_type_name:{}".format(output_type_name))
+    print("input type : {}".format(type(out)))
     #print("context_g contains {} : {}".format("output", "output" in g))
     try:
         g["output"]=out
@@ -190,6 +194,7 @@ def output_conversion_test(output_type_name, out, g, l, b, c):
         oto=eval("{}(output)".format(output_type_name),g)
         tf=datetime.datetime.now()
         # if has dump method try to write to "output_data.dat"
+        print("output type has dump : {}".format(hasattr(oto,"dump")))
         if not hasattr(oto,"dump"):
             # if object is pickleable then mabey keep it
             return output,ti,tf
@@ -205,7 +210,11 @@ def output_conversion_test(output_type_name, out, g, l, b, c):
 
 def get_test_output(error_code=-1, stdout=None, c_type=2, _globals=None, _locals=None, error=None,\
         output=None, start_dt=None, stop_dt=None, conv_start_dt=None,conv_stop_dt=None):
-    a,b=list(_globals.keys()),list(_locals.keys())
+    a,b=[],[]
+    if _globals:
+        a=list(_globals.keys())
+    if _locals:
+        b=list(_locals.keys())
     return {"error_code":error_code, "stdout":stdout, "type":c_type, "globals":a,\
             "locals":b, "error":error,"output":output,"output_type":type(output),\
             "start_dt":start_dt, "stop_dt":stop_dt, "conversion_start_dt":conv_start_dt,\
@@ -282,9 +291,18 @@ if __name__=="__main__":
                 constructor_f=function_instantiation_test(name,context_g,context_l, buf,code_type)
                 # class instantiation test
                 instance=class_instantiation_test(constructor_f, c_args,c_kwargs, context_g,context_l, buf,code_type)
+                print("class instance : {}\ninstance type : {}".format(instance, type(instance)))
+            
+            # if there are input data but the object is not callable
+            if not hasattr(instance, "__call__"):
+                test_output=get_test_output(error_code=exit_code(INSTANCE_NOT_CALLABLE_ERROR), error="code instance is not callable, perhaps you forgot to implement a __call__ method")
+                save_output(test_output)
+                exit(exit_code(INSTANCE_NOT_CALLABLE_ERROR))
+
             # if no input data return SUCCESS
             if not os.path.exists(INPUT_FILENAME):
                 # try calling with no arguments
+                print("no input file : instance : {}".format(instance))
                 output,ti,tf=execution_test(instance,(),{},context_g,context_l,buf,code_type)
                 test_output=get_test_output(error_code=0, stdout=buf.getvalue(),c_type=code_type,\
                                        _globals=context_l, _locals=context_l,error=None,\
@@ -292,11 +310,6 @@ if __name__=="__main__":
                 save_output(test_output)
                 exit(exit_code(SUCCESS))
 
-            # if there are input data but the object is not callable
-            if not hasattr(instance, "__call__"):
-                test_output=get_test_output(error_code=INSTANCE_NOT_CALLABLE_ERROR, error="code instance is not callable, perhaps you forgot to implement a __call__ method")
-                save_output(test_output)
-                exit(exit_code(INSTANCE_NOT_CALLABLE_ERROR))
 
             # execute instance ( input_args)
             output,ti,tf=execution_test(instance.__call__, i_args, i_kwargs, context_g, context_l,buf, code_type)
