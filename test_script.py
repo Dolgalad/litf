@@ -336,6 +336,7 @@ if __name__=="__main__":
                         context_g["output"]=output
                         #print("postprocess input type : {}".format(type(output)))
                         ev=eval("{}(output)".format(process_name),context_g)
+                        ev_type=type(ev)
                         print("postprocess ev type : {}".format(type(ev)))
                         # cast to float or int
                         if isinstance(ev, float):
@@ -345,7 +346,10 @@ if __name__=="__main__":
                         elif isinstance(ev, str):
                             pass
                         else:
-                            raise Exception("postprocessing {} : output should be float, int, or str type")
+                            try:
+                                ev=pkl.dumps(ev)
+                            except Exception as e:
+                                raise Exception("postprocessing {} : output should be float, int, or str type, got {}\n{}".format(process_name, ev_type, e)
                         postprocessing_info.append([process_name, ev])
                     except Exception as e:
                         print("postprocessing error - {} : \n{}".format(process_name, e))
