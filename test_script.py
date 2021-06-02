@@ -349,7 +349,7 @@ if __name__=="__main__":
                             try:
                                 ev=pkl.dumps(ev)
                             except Exception as e:
-                                raise Exception("postprocessing {} : output should be float, int, or str type, got {}\n{}".format(process_name, ev_type, e)
+                                raise Exception("postprocessing {} : output should be float, int, or str type, got {}\n{}".format(process_name, ev_type, e))
                         postprocessing_info.append([process_name, ev])
                     except Exception as e:
                         print("postprocessing error - {} : \n{}".format(process_name, e))
