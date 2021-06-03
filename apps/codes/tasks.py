@@ -97,12 +97,14 @@ def code_updated_task(code_id, **kwargs):
 
     # kill all code_update_task tasks that involve a CodeModel object that depends on the current object
     CELERY_TASK_LIST="celery@{}".format(socket.gethostname())
-    print("CELERY_TASK_LIST : {}".format(CELERY_TASK_LIST))
+    CELERY_LOCALHOST="celery@localhost"
     print("active tasks keys : {}".format([k for k in active_tasks]))
     task_list=[]
     if CELERY_TASK_LIST in active_tasks:
         task_list=active_tasks[CELERY_TASK_LIST]
-    for task in active_tasks["celery@mademu"]:
+    elif CELERY_LOCALHOST in active_tasks:
+        task_list=active_tasks[CELERY_LOCALHOST]
+    for task in task_list:
         # check if this task conflicts with the current task i.e. task involves code that depends on
         # current code
         if task["id"]!=code_updated_task.request.id and task["name"]=="apps.codes.tasks.code_updated_task":
