@@ -74,7 +74,7 @@ class CodeManager:
             
             return {"error_code":-2, "error":errs,"stdout":"", "output":None, "output_type":None, "start_dt":None, "stop_dt": None}
         out=CodeManager.load_output(venv.path)
-        print("exit code : {}".format(out["error_code"]))
+        #print("exit code : {}".format(out["error_code"]))
         print("stdout : {}".format(out["stdout"]))
         print("error  : {}".format(out["error"]))
         return out
@@ -185,7 +185,6 @@ class CodeManager:
                     continue
                 if isinstance(process_out, str):
                     pp=os.path.join(venv.path, process_out)
-                    os.system("ls {}".format(venv.path))
                     if os.path.exists(pp):
                         # save the output file somewhere
                         from django.core.files import File
@@ -198,10 +197,15 @@ class CodeManager:
                                                                  execution_result=erm.result)
                         postpr.save()
                 else:
+                    output_type=type(process_out)
+                    data=process_out
+                    if not isinstance(process_out, bytes):
+                        data=pkl.dumps(data)
                     postpr=PostprocessingResultModel.objects.create(problem=solver.problem,\
                                                                  implementation=process_obj,\
                                                                  solver=solver,\
-                                                                 output_data=process_out,\
+                                                                 output_data=data,\
+                                                                 output_type=str(output_type),\
                                                                  execution_result=erm.result)
                     postpr.save()
 

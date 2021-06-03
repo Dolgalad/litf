@@ -1,7 +1,7 @@
 from django.urls import path
 
 # import views
-from .views import IndexView, DetailView, AddView, EditView, DataAddView, PostprocessAddView, PostprocessEditView
+from .views import IndexView, DetailView, AddView, EditView, DataAddView, PostprocessAddView, PostprocessEditView, postprocess_output_download_view
 urlpatterns = [
         path("index/", IndexView.as_view(), name="problem_index"),
         path("add/", AddView.as_view(), name="problem_add"),
@@ -11,5 +11,6 @@ urlpatterns = [
 
         path("<int:pk>/postprocess_add", PostprocessAddView.as_view(), name="postprocess_add"),
         path("postprocess_edit/<int:pk>/", PostprocessEditView.as_view(), name="postprocess_edit"),
+        path("postprocess_output/<int:pk>/", postprocess_output_download_view, name="postprocess_output_download"),
         
         ]

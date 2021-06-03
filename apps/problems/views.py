@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView, CreateView, UpdateView
 from django.utils import timezone
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 # my problem forms
 from apps.codes.forms import CodeModelForm
@@ -16,6 +16,11 @@ from libs.utils import debug_print, delete_problems, get_checked_solvers, get_ch
 
 # tasks
 from .tasks import problem_submitted_task, problem_updated_task, postprocess_updated_task
+
+from wsgiref.util import FileWrapper
+
+import os
+from io import BytesIO, StringIO
 # Create your views here.
 
 class DetailView(TemplateView):
@@ -243,3 +248,28 @@ class PostprocessEditView(UpdateView):
 
 class AboutView(TemplateView):
     template_name="about.html"
+
+def getsize(f):
+    p=f.tell()
+    f.seek(0,os.SEEK_END)
+    s=f.tell()
+    f.seek(p)
+    return s
+
+def postprocess_output_download_view(request, pk):
+    print("Download output for postprocess result : {}".format(pk))
+    file_content=PostprocessingResultModel.objects.get(id=pk).output_data
+    # file content in bytes
+    if isinstance(file_content, bytes):
+        f=BytesIO(file_content)
+    else:
+        f=StringIO(file_content)
+    s=getsize(f)
+    wrapper=FileWrapper(f)
+    #response=HttpResponse(wrapper, content_type="text/plain")
+    response=HttpResponse(wrapper, content_type="text/plain")
+    response["Content-Disposition"]="attachement; filename=output"
+    response["Content-Length"]=s
+    return response
+
+
