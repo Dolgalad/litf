@@ -135,7 +135,8 @@ class CodeManager:
                 print("WARNING : Solver has a pending execution result")
                 return
             # create a pending SolverExecutionResultModel
-            solver.create_pending_execution_result()
+            print("CREATING A SOLVER EXECUTION RESULT")
+            result=solver.create_pending_execution_result()
 
         
         # initialize info_data
@@ -390,11 +391,11 @@ class CodeManager:
             if e.flags is None:
                 e.set_pending()
             elif "integrity"== e.flags:
-                e.delete()
+                e.set_pending()
             else:
                 e.set_pending()
         # create the pending ExecutionResultModel, state set to RUNNING and start time set to now
-        res=cm.create_pending_execution_result()
+        res=cm.get_integrity_result()
         
 
 

@@ -15,9 +15,18 @@ import socket
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(10.0, run_next_pending_execution.s(), name="hello_period")
+    sender.add_periodic_task(10.0, generate_dependency_graph.s(), name="dependency_graph")
+
+from libs.code.graph import dependency_graph, get_graphviz
+import os
 @app.task
-def test(arg):
-    print(arg)
+def generate_dependency_graph():
+    g=dependency_graph()
+    f=open("dependency_graph_temp.gv","w")
+    f.write(get_graphviz(g))
+    f.close()
+    os.system("dot -Tps dependency_graph_temp.gv -o dependency_graph.ps")
+
 
 @app.task
 def run_next_pending_execution():

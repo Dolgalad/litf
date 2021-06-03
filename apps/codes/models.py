@@ -129,8 +129,15 @@ class CodeModel(models.Model):
     def has_pending_execution_result(self):
         a=self.get_pending_execution_result()
         return not a is None
+    def get_integrity_result(self):
+        ep=ExecutionResultModel.objects.filter(implementation=self,flags="integrity") 
+        if len(ep):
+            return ep[0]
+        ep=ExecutionResultModel.objects.create(implementation=self, flags="integrity", status=status.CodeExecutionStatus.PENDING)
+        ep.save()
+        return ep
     def create_pending_execution_result(self):
-        ep=ExecutionResultModel.objects.create(implementation=self,status=status.CodeExecutionStatus.RUNNING, start_time=timezone.now())
+        ep=ExecutionResultModel.objects.create(implementation=self,status=status.CodeExecutionStatus.RUNNING, start_time=timezone.now(), flags="created")
         ep.save()
         return ep
     def has_integrity_check(self):
