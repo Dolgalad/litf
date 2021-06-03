@@ -44,7 +44,7 @@
 	    <a href="/login/">Login</a>
 	  {% endif %}
 	  <a href="/problem/index/">Index</a>
-	  <a href="/admin">Admin</a>
+	  <a href="/admin/">Admin</a>
           <a href="#contact">Contact</a>
 	  <a href="{% url 'about' %}">About</a>
         </div>
@@ -53,10 +53,8 @@
 
     <main>
 	    <section>{% block main_block %}Main block{% endblock %}</section>
-	    <!--<aside>{% block aside_block %}{% endblock %}</aside>
-
-
-	    </aside>-->
+	    <aside>{% block aside_block %}{% endblock %}
+	    </aside>
     </main>
 
     <footer>{% block footer_block %}Footer block{% endblock %}</footer>

@@ -77,7 +77,6 @@ class ArgumentInfo:
                 return kw
         return None
     def compatible_with(self, *args, **kwargs):
-        print("checking compatibility with arguments : {} {}".format(args, kwargs))
         # if total number of arguments is less then number of positionals then false
         if self.n_positional()>len(args)+len(kwargs):
             print("Not enough arguments")
@@ -150,7 +149,6 @@ def get_next_arg(s):
     :return: next argument info object and rest of string
     :rtype: tuple(ArgList or NoneType, str)
     """
-    #print("test : {}".format(s))
     # strip spaces
     s=s.strip()
     # next comma position
@@ -194,7 +192,6 @@ def get_f_args(f_name, code):
     # get the function definition regex
     r='^[ ]*def[ ]+{}[ ]*\((?P<args>.*)\)[ ]*:[ ]*$'.format(f_name)
     r="[ ]*def[ ]+{}\((?P<args>.*)\)".format(f_name)
-    print(r)
     # for line in code
     a=[]
     for l in code.split("\n"):

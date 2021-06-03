@@ -31,7 +31,6 @@ class AddView(CreateView):
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
     def get_form_class(self, *args, **kwargs):
-        print("codes.views.AddView.get_form_class")
         fc=super().get_form_class(*args,**kwargs)
         #fc._meta.widgets={"code": forms.Textarea}
         return fc
@@ -103,26 +102,19 @@ class EditView(UpdateView):
             context["popup"]=True
         else:
             context["popup"]=False
-        print("EditView.get_context_data : {}".format(context))
         return context
     def form_valid(self, form):
         self.object=form.save()
         code_updated_task.delay(self.object.id)
         return super().form_valid(form)
     def get_form_kwargs(self):
-        print("codes.views.EditView.get_form_kwargs()")
         a=super().get_form_kwargs()
         return a
     def get_initial(self):
         context=super().get_initial()
         context["author"]=self.request.user
-        print("in EditView.get_initial : {}".format(context))
         return context
     def get(self, *args, **kwargs):
-        print("in EditView.get")
-        print(args)
-        print(kwargs)
-        print(args[0].GET)
         return super().get(*args,**kwargs)
         
 

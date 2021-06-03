@@ -31,7 +31,6 @@ class LoginView(FormView):
             user=authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                print("In LoginView.post : just before redirect")
                 return HttpResponseRedirect(reverse("profile"))
         else:
             print("WARNING : authenticate failed : {}".format(request.POST))
@@ -67,7 +66,6 @@ class RegistrationView(FormView):
 class ProfileView(TemplateView):
     template_name="users/profile.html"
     def post(self, request):
-        debug_print("in apps.users.views.ProfileView : {}".format(request.POST))
         if "problem_add" in request.POST:
             return HttpResponseRedirect(reverse("problem_add"))
         if "problem_delete" in request.POST:
@@ -100,17 +98,13 @@ class ProfileView(TemplateView):
                     debug_print("More then 1 datafile id provided for editing, editing first : {}".format(ids[0]))
                 return HttpResponseRedirect(reverse("datafile_edit", kwargs={"pk":ids[0]}))
         if "datafile_delete" in request.POST:
-            print("DELETING FILES")
             ids=get_checked_datafiles(request.POST)
             delete_datafiles(ids, request.user)
         return HttpResponseRedirect(reverse("profile"))
     def get(self, request):
-        print("ProfileView get: {}".format(request))
         return super().get(request)
     def get_context_data(self, **kwargs):
         context=super().get_context_data(**kwargs)
-        print("in ProfileView : ")
-        print( context)
         # user created problems
         context["problems"]=ProblemModel.objects.filter(author=self.request.user)
         context["codes"]=CodeModel.objects.filter(author=self.request.user)

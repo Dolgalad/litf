@@ -23,7 +23,6 @@ class DetailView(TemplateView):
         context["solutions"]=ExecutionResultModel.objects.filter(implementation=solver.implementation)
         context["postprocessing"]=PostprocessingResultModel.objects.filter(problem=solver.problem,\
                                                                            solver=solver)
-        print("post process ing  : {}", context["postprocessing"])
         return context
 
 class AddView(CreateView):

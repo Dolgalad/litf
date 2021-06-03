@@ -63,9 +63,6 @@ class CodeManager:
     @staticmethod
     def run_test_and_get_output(venv, params=""):
         ts=venv.run_test_script(params)
-        print("run_test_and_get_output : {}".format(ts))
-        print("stdout : {}".format(ts.stdout))
-        print("stderr : {}".format(ts.stderr))
         # check if output file exists
         if not os.path.exists(os.path.join(venv.path,"test_output.json")):
             errs="output file not found"
@@ -74,9 +71,6 @@ class CodeManager:
             
             return {"error_code":-2, "error":errs,"stdout":"", "output":None, "output_type":None, "start_dt":None, "stop_dt": None}
         out=CodeManager.load_output(venv.path)
-        #print("exit code : {}".format(out["error_code"]))
-        print("stdout : {}".format(out["stdout"]))
-        print("error  : {}".format(out["error"]))
         return out
     @staticmethod
     def get_solver_venv_dir(problem_id, solver_id):
@@ -109,7 +103,6 @@ class CodeManager:
     @staticmethod
     def get_problem_solver_input_data(solver):
         input_data=[f.datafile.path for f in solver.problem.input_data.all() if f.flags=="input"]
-        print("input data : {}".format(input_data))
         # if no input data available
         if input_data==[]:
             # create a temporary file
@@ -119,9 +112,9 @@ class CodeManager:
         return input_data
     @staticmethod
     def solver_run(solver_id, result=None):
-        msg="Solver_run : solver_id={}".format(solver_id)
+        msg="Solver_run : id:{}".format(solver_id)
         if not result is None:
-            msg+=", result={}".format(result.id)
+            msg+=" result_id:{}".format(result.id)
         print(msg)
 
         solver=SolverModel.objects.get(id=solver_id)
@@ -139,7 +132,7 @@ class CodeManager:
         if result is None:
             # check if an incomplete SolverExecutionResultModel exists for this solver
             if solver.has_pending_execution_result():
-                print("Solver has a pending execution result")
+                print("WARNING : Solver has a pending execution result")
                 return
             # create a pending SolverExecutionResultModel
             solver.create_pending_execution_result()
@@ -164,7 +157,8 @@ class CodeManager:
 
         # execute the test script and get output
         output=CodeManager.run_test_and_get_output(venv, "{} code".format(solver.implementation.name))
-        print("\texit_code={}".format(output["error_code"]))
+
+        #print("\texit_code={}".format(output["error_code"]))
         if not "output" in output:
             output["output"]=None
         # if the output is a string and a file exists with the same name in the virtual environement
@@ -175,7 +169,6 @@ class CodeManager:
 
         # postprocessing
         if "postprocessing" in output:
-            print("\tpostprocessing : {}".format(output["postprocessing"]))
             for [process_name, process_out] in output["postprocessing"]:
                 process_obj=None
                 for ppp in solver.problem.postprocess.all():
@@ -295,24 +288,19 @@ class CodeManager:
             CodeManager.check_code_status(d.id)
     @staticmethod
     def get_codemodel_input_data(cm):
-        print("get codemodel input data")
         # check the codemodels parameters
         if cm.arguments is None:
-            print("\tcodemodel has no arguments 1")
             return []
         cm_params = json.loads(cm.arguments.data)
         if cm_params is None:
-            print("\tcodemodel has no arguments 2")
             return []
         # get input data compatible with the number of positional arguments
         n=len(cm_params["args"])
         if n==0:
-            print("\tcodemodel has no arguments 3")
             return []
         # store some floats in a pkl file
         in_dat=tuple(list(range(n)))
         pkl.dump((in_dat,{}), open("temp_input_data.pkl","wb"))
-        print("\tinput_data : {}".format(in_dat))
         return ["temp_input_data.pkl"]
 
     @staticmethod
@@ -349,12 +337,13 @@ class CodeManager:
 
     @staticmethod
     def codemodel_execute_result(cm, res):
+        print("CodeModel result rerun : id:{} result_id:{}".format(cm.id, res.id))
+        # set result status to RUNNING
+        res.status=status.CodeExecutionStatus.RUNNING
+        res.save()
         # get resources for the codemodel
         # get input data for result object
         resources=CodeManager.get_codemodel_resources(cm)
-        # set the result status to RUNNING 
-        res.status=status.ExecutionStatus.RUNNING
-        res.save()
 
         # check the codemodel arguments
         CodeManager.check_codemodel_arguments(cm)
@@ -371,7 +360,7 @@ class CodeManager:
 
         # run the testing script
         output=CodeManager.run_test_and_get_output(venv, "{} code".format(cm.name))
-        print(output)
+        print("exit_code : {}".format(output["error_code"]))
 
 
         # save the output
@@ -390,6 +379,7 @@ class CodeManager:
     def check_code_status(code_id, check_type="code", input_data=[]):
         # get the CodeModel object
         cm=CodeModel.objects.get(id=code_id)
+        print("CodeModel status check : id:{} name:{}".format(code_id,cm.name))
 
         # check the codemodel arguments
         CodeManager.check_codemodel_arguments(cm)
@@ -403,8 +393,9 @@ class CodeManager:
                 e.delete()
             else:
                 e.set_pending()
-        # create the pending ExecutionResultModel
-        cm.create_pending_execution_result()
+        # create the pending ExecutionResultModel, state set to RUNNING and start time set to now
+        res=cm.create_pending_execution_result()
+        
 
 
         # get resources
@@ -423,20 +414,21 @@ class CodeManager:
 
         # run the testing script
         output=CodeManager.run_test_and_get_output(venv, "{} code".format(cm.name))
+        print("\texit_code : {}".format(output["error_code"]))
+
 
 
         # save the output
-        erm=CodeManager.save_output_erm(cm, output, flags="integrity")
+        erm=CodeManager.save_output_erm(cm, output, flags="integrity", erm=res)
 
 
         # set the codemodels status
         cm.status=erm.status
         cm.save()
-        #erm.save()
 
         # remove venv
         venv.delete_env()
-        return CodeStatus.UNCHECKED
+        return erm.status
 
     @staticmethod
     def check_solver_status(solver_id):
@@ -466,3 +458,9 @@ class CodeManager:
         execution_results=ExecutionResultModel.objects.filter(implementation=cm)
         for er in execution_results:
             er.set_pending()
+
+    @staticmethod
+    def execute_problem_solver_run(solver_result):
+
+        CodeManager.solver_run(solver_result.solver.id,result=solver_result)
+

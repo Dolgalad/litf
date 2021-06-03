@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
 # import general settings for this project
 from libs import settings
@@ -39,6 +40,8 @@ class CodeModel(models.Model):
     def get_dependants(self):
         a=[]
         for c in CodeModel.objects.all():
+            if c==self:
+                continue
             if c.depends(self):
                 if not c in a:
                     a.append(c)
@@ -127,8 +130,15 @@ class CodeModel(models.Model):
         a=self.get_pending_execution_result()
         return not a is None
     def create_pending_execution_result(self):
-        ep=ExecutionResultModel.objects.create(implementation=self,status=status.CodeExecutionStatus.PENDING)
+        ep=ExecutionResultModel.objects.create(implementation=self,status=status.CodeExecutionStatus.RUNNING, start_time=timezone.now())
         ep.save()
+        return ep
+    def has_integrity_check(self):
+        ep=ExecutionResultModel.objects.filter(implementation=self,flags="integrity")
+        if len(ep)==0:
+            return False
+        return not (ep[0].status==status.CodeExecutionStatus.PENDING or \
+                    ep[0].status==status.CodeExecutionStatus.RUNNING)
 
 class ExecutionResultModel(models.Model):
     implementation=models.ForeignKey(CodeModel, on_delete=models.CASCADE)

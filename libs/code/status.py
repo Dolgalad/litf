@@ -33,8 +33,9 @@ class CodeExecutionStatus:
     CLASS_INSTANTIATION_ERROR=9
     UNKWN_CODE_TYPE=10
     OUTPUT_CONVERSION_ERROR=11
-    PENDING=12
-    RUNNING=13
+    INSTANCE_NOT_CALLABLE_ERROR=12
+    PENDING=13
+    RUNNING=14
     UNCHECKED=-1
 
 execution_status_msg={-2:"failure",\

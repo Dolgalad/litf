@@ -1,5 +1,6 @@
 django
 celery
+django_celery_beat
 virtualenv
 markdown
 psutil

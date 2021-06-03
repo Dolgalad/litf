@@ -109,7 +109,6 @@ class DetailView(TemplateView):
             t_p=[]
             for sol in t_s:
                 t_p.append(PostprocessingResultModel.objects.filter(execution_result=sol.result))
-                print("sol : {}, process : {}".format(sol.id, t_p))
                 s.append((sol, t_p[-1]))
         return s
 
@@ -242,7 +241,6 @@ class PostprocessEditView(UpdateView):
     def get_initial(self):
         context=super().get_initial()
         context["author"]=self.request.user
-        print("in PostprocessEditView.get_initial : {}".format(context))
         return context
 
 
@@ -257,7 +255,6 @@ def getsize(f):
     return s
 
 def postprocess_output_download_view(request, pk):
-    print("Download output for postprocess result : {}".format(pk))
     file_content=PostprocessingResultModel.objects.get(id=pk).output_data
     # file content in bytes
     if isinstance(file_content, bytes):
